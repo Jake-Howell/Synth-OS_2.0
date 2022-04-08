@@ -1,3 +1,4 @@
+
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -210,6 +211,19 @@ void TIM4_IRQHandler(void)
 
   /* USER CODE END TIM4_IRQn 1 */
 }
+
+/**
+  * @brief This function handles USART2 global interrupt.
+  */
+//void USART2_IRQHandler(void)
+//{
+//	extern MIDI keyboard;
+//	char d;
+//	USART2->ISR &= ~(1u<<5);	//clear interupt flag
+//	d = USART2->RDR;
+//	keyboard.put_MIDI_data(d);
+//	
+//}
 
 /**
   * @brief This function handles TIM5 global interrupt.

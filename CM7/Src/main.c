@@ -1,31 +1,83 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2022 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "../../toneGenerator.cpp"
-#include "../../Common/inc/USART.hpp"
-#include "../../Common/inc/TIMERS.hpp"
-#include "../../Common/inc/MIDI_Decoder.hpp"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
+/* USER CODE END PD */
 
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_DAC1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
-static void MX_TIM17_Init(void);
 static void MX_I2S2_Init(void);
 static void MX_SPI1_Init(void);
-double w(double Hz);
+static void MX_TIM17_Init(void);
+/* USER CODE BEGIN PFP */
 
-MIDI PC_Keys(USART3, GPIOD, 9,8, 115200);
-Synth synth[10]; //create 10 synths for polyphonic playing
+/* USER CODE END PFP */
 
-bool kontinue = 0;
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
-	//GPIOD->MODER = (0);
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   LL_APB4_GRP1_EnableClock(LL_APB4_GRP1_PERIPH_SYSCFG);
@@ -33,57 +85,45 @@ int main(void)
   /* System interrupt init*/
   NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
   /* Configure the system clock */
   SystemClock_Config();
-	
-  /* Initialize all configured peripherals */
-	
 
-	
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   MX_DAC1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
-	MX_TIM17_Init();
-//  MX_I2S2_Init();
-//  MX_SPI1_Init();
+  MX_I2S2_Init();
+  MX_SPI1_Init();
+  MX_TIM17_Init();
+  /* USER CODE BEGIN 2 */
 
-	GPIOC->ODR ^= (1u<<2);
-	
+  /* USER CODE END 2 */
 
-	volatile double out;
-	volatile uint16_t DAC_OUTPUT = 0;
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    /* USER CODE END WHILE */
 
-	volatile double tick = 0;
-	while(1){
-		while (kontinue)
-		{
-			
-			for (int i = 0; i < 10; i++){
-				out += synth[i].waveGen();	//get output from each synth and add it to master out
-			}
-			
-			out = (out > 1.0)?1.0:out;	//hard clipping
-			out = (out < 0.0)? 0:out;
-			kontinue = 0;
-			DAC_OUTPUT = (0xFFF*(uint16_t)out);	//convert to 12bit int
-			
-			DAC1->DHR12R2 = DAC_OUTPUT;
-		}
-		__NOP();
-	}
+    /* USER CODE BEGIN 3 */
+  }
+  /* USER CODE END 3 */
 }
 
-double w(double Hz){
-	return Hz * 2 * PI;
-}
-
-void TIM17_IRQHandler(void) {
-	TIM17->SR &= ~LL_TIM_SR_UIF;	//clear interupt flag
-	kontinue = 1;
-}
-
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
   LL_FLASH_SetLatency(LL_FLASH_LATENCY_4);
@@ -138,20 +178,59 @@ void SystemClock_Config(void)
   LL_Init1msTick(480000000);
 
   LL_SetSystemCoreClock(480000000);
-	SystemCoreClockUpdate();
 }
 
+/**
+  * @brief DAC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_DAC1_Init(void)
+{
 
-static void MX_DAC1_Init(void){
+  /* USER CODE BEGIN DAC1_Init 0 */
 
-//  /* Peripheral clock enable */
-	int pin = 5;
+  /* USER CODE END DAC1_Init 0 */
 
+  LL_DAC_InitTypeDef DAC_InitStruct = {0};
 
-	RCC->APB1LENR |= RCC_APB1LENR_DAC12EN;	//enable DAC Clock
-	RCC->AHB4ENR 	|= RCC_AHB4ENR_GPIOAEN;		//Enable GPIO A Clock
-	GPIOA->MODER	|= (3u<<(2*pin));
-	DAC1->CR				|=DAC_CR_EN2;							//DAC 1 enabled
+  LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* Peripheral clock enable */
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_DAC12);
+
+  LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOA);
+  /**DAC1 GPIO Configuration
+  PA4   ------> DAC1_OUT1
+  PA5   ------> DAC1_OUT2
+  */
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_4|LL_GPIO_PIN_5;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN DAC1_Init 1 */
+
+  /* USER CODE END DAC1_Init 1 */
+
+  /** DAC channel OUT1 config
+  */
+  DAC_InitStruct.TriggerSource = LL_DAC_TRIG_SOFTWARE;
+  DAC_InitStruct.WaveAutoGeneration = LL_DAC_WAVE_AUTO_GENERATION_NONE;
+  DAC_InitStruct.OutputBuffer = LL_DAC_OUTPUT_BUFFER_ENABLE;
+  DAC_InitStruct.OutputConnection = LL_DAC_OUTPUT_CONNECT_GPIO;
+  DAC_InitStruct.OutputMode = LL_DAC_OUTPUT_MODE_NORMAL;
+  LL_DAC_Init(DAC1, LL_DAC_CHANNEL_1, &DAC_InitStruct);
+  LL_DAC_DisableTrigger(DAC1, LL_DAC_CHANNEL_1);
+
+  /** DAC channel OUT2 config
+  */
+  LL_DAC_Init(DAC1, LL_DAC_CHANNEL_2, &DAC_InitStruct);
+  LL_DAC_DisableTrigger(DAC1, LL_DAC_CHANNEL_2);
+  /* USER CODE BEGIN DAC1_Init 2 */
+
+  /* USER CODE END DAC1_Init 2 */
+
 }
 
 /**
@@ -159,7 +238,13 @@ static void MX_DAC1_Init(void){
   * @param None
   * @retval None
   */
-static void MX_I2S2_Init(void){
+static void MX_I2S2_Init(void)
+{
+
+  /* USER CODE BEGIN I2S2_Init 0 */
+
+  /* USER CODE END I2S2_Init 0 */
+
   LL_I2S_InitTypeDef I2S_InitStruct = {0};
 
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -167,9 +252,7 @@ static void MX_I2S2_Init(void){
   LL_RCC_SetSPIClockSource(LL_RCC_SPI123_CLKSOURCE_PLL1Q);
 
   /* Peripheral clock enable */
-  //__HAL_RCC_SPI2_CLK_ENABLE();
-	
-
+  __HAL_RCC_SPI2_CLK_ENABLE();
 
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOB);
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC);
@@ -195,6 +278,9 @@ static void MX_I2S2_Init(void){
   GPIO_InitStruct.Alternate = LL_GPIO_AF_5;
   LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+  /* USER CODE BEGIN I2S2_Init 1 */
+
+  /* USER CODE END I2S2_Init 1 */
   I2S_InitStruct.Mode = LL_I2S_MODE_MASTER_TX;
   I2S_InitStruct.Standard = LL_I2S_STANDARD_PHILIPS;
   I2S_InitStruct.DataFormat = LL_I2S_DATAFORMAT_16B;
@@ -202,6 +288,10 @@ static void MX_I2S2_Init(void){
   I2S_InitStruct.AudioFreq = LL_I2S_AUDIOFREQ_8K;
   I2S_InitStruct.ClockPolarity = LL_I2S_POLARITY_LOW;
   LL_I2S_Init(SPI2, &I2S_InitStruct);
+  /* USER CODE BEGIN I2S2_Init 2 */
+
+  /* USER CODE END I2S2_Init 2 */
+
 }
 
 /**
@@ -211,6 +301,11 @@ static void MX_I2S2_Init(void){
   */
 static void MX_SPI1_Init(void)
 {
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
   LL_SPI_InitTypeDef SPI_InitStruct = {0};
 
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -260,17 +355,63 @@ static void MX_SPI1_Init(void)
   LL_SPI_Init(SPI1, &SPI_InitStruct);
   LL_SPI_SetStandard(SPI1, LL_SPI_PROTOCOL_MOTOROLA);
   LL_SPI_EnableNSSPulseMgt(SPI1);
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
+
 }
+
+/**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_TIM2_Init(void)
-{	
-	RCC->APB1LENR |= RCC_APB1LENR_TIM2EN;
-	TIM2->PSC = 2511;
-	TIM2->ARR = 0xFFFFFFFE;
-	TIM2->CNT = 0;
-	TIM2->CR1|= TIM_CR1_CEN;
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  LL_TIM_InitTypeDef TIM_InitStruct = {0};
+
+  /* Peripheral clock enable */
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2);
+
+  /* TIM2 interrupt Init */
+  NVIC_SetPriority(TIM2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
+  NVIC_EnableIRQ(TIM2_IRQn);
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  TIM_InitStruct.Prescaler = 240;
+  TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
+  TIM_InitStruct.Autoreload = 4294967295;
+  TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
+  LL_TIM_Init(TIM2, &TIM_InitStruct);
+  LL_TIM_DisableARRPreload(TIM2);
+  LL_TIM_SetClockSource(TIM2, LL_TIM_CLOCKSOURCE_INTERNAL);
+  LL_TIM_SetTriggerOutput(TIM2, LL_TIM_TRGO_RESET);
+  LL_TIM_DisableMasterSlaveMode(TIM2);
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
 }
+
+/**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_TIM3_Init(void)
 {
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
   LL_TIM_InitTypeDef TIM_InitStruct = {0};
 
   /* Peripheral clock enable */
@@ -280,49 +421,100 @@ static void MX_TIM3_Init(void)
   NVIC_SetPriority(TIM3_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
   NVIC_EnableIRQ(TIM3_IRQn);
 
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
   TIM_InitStruct.Prescaler = 240;
   TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-  TIM_InitStruct.Autoreload = 0XFFFF;
+  TIM_InitStruct.Autoreload = 65535;
   TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
   LL_TIM_Init(TIM3, &TIM_InitStruct);
   LL_TIM_DisableARRPreload(TIM3);
   LL_TIM_SetClockSource(TIM3, LL_TIM_CLOCKSOURCE_INTERNAL);
   LL_TIM_SetTriggerOutput(TIM3, LL_TIM_TRGO_RESET);
   LL_TIM_DisableMasterSlaveMode(TIM3);
-	NVIC_EnableIRQ(TIM3_IRQn);
-	TIM3->CR1|= TIM_CR1_CEN;
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
+
 }
 
+/**
+  * @brief TIM17 Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_TIM17_Init(void)
 {
+
+  /* USER CODE BEGIN TIM17_Init 0 */
+
+  /* USER CODE END TIM17_Init 0 */
+
+  LL_TIM_InitTypeDef TIM_InitStruct = {0};
+
+  LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+
   /* Peripheral clock enable */
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM17);
 
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOF);
-
+  /**TIM17 GPIO Configuration
+  PF7   ------> TIM17_CH1
+  */
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_7;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
+  LL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
   /* TIM17 interrupt Init */
   NVIC_SetPriority(TIM17_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
-  
+  NVIC_EnableIRQ(TIM17_IRQn);
 
-	TIM17->DIER |= TIM_DIER_UIE;					//timer update interrupt enabled
-	
-	TIM17->PSC = 20;
-	TIM17->ARR = 110;
-	TIM17->CNT = 0;
-	NVIC_EnableIRQ(TIM17_IRQn);
-	TIM17->CR1|= TIM_CR1_CEN;
+  /* USER CODE BEGIN TIM17_Init 1 */
+
+  /* USER CODE END TIM17_Init 1 */
+  TIM_InitStruct.Prescaler = 0;
+  TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
+  TIM_InitStruct.Autoreload = 65535;
+  TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
+  TIM_InitStruct.RepetitionCounter = 0;
+  LL_TIM_Init(TIM17, &TIM_InitStruct);
+  LL_TIM_DisableARRPreload(TIM17);
+  LL_TIM_IC_SetActiveInput(TIM17, LL_TIM_CHANNEL_CH1, LL_TIM_ACTIVEINPUT_DIRECTTI);
+  LL_TIM_IC_SetPrescaler(TIM17, LL_TIM_CHANNEL_CH1, LL_TIM_ICPSC_DIV1);
+  LL_TIM_IC_SetFilter(TIM17, LL_TIM_CHANNEL_CH1, LL_TIM_IC_FILTER_FDIV1);
+  LL_TIM_IC_SetPolarity(TIM17, LL_TIM_CHANNEL_CH1, LL_TIM_IC_POLARITY_RISING);
+  /* USER CODE BEGIN TIM17_Init 2 */
+
+  /* USER CODE END TIM17_Init 2 */
+
 }
 
-
+/**
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_USART3_UART_Init(void)
 {
 
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
   LL_USART_InitTypeDef USART_InitStruct = {0};
+
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+
   LL_RCC_SetUSARTClockSource(LL_RCC_USART234578_CLKSOURCE_PCLK1);
+
   /* Peripheral clock enable */
   LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3);
+
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD);
   /**USART3 GPIO Configuration
   PD8   ------> USART3_TX
@@ -336,11 +528,13 @@ static void MX_USART3_UART_Init(void)
   GPIO_InitStruct.Alternate = LL_GPIO_AF_7;
   LL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
+  /* USER CODE BEGIN USART3_Init 1 */
 
+  /* USER CODE END USART3_Init 1 */
   USART_InitStruct.PrescalerValue = LL_USART_PRESCALER_DIV1;
-  USART_InitStruct.BaudRate = (unsigned int)((double)115200*1.061);	//baud rate * correction
-  USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;	//
-  USART_InitStruct.StopBits = LL_USART_STOPBITS_2;
+  USART_InitStruct.BaudRate = 115200;
+  USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
+  USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
   USART_InitStruct.Parity = LL_USART_PARITY_NONE;
   USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
   USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
@@ -351,12 +545,19 @@ static void MX_USART3_UART_Init(void)
   LL_USART_EnableFIFO(USART3);
   LL_USART_ConfigAsyncMode(USART3);
 
+  /* USER CODE BEGIN WKUPType USART3 */
+
+  /* USER CODE END WKUPType USART3 */
+
   LL_USART_Enable(USART3);
 
   /* Polling USART3 initialisation */
   while((!(LL_USART_IsActiveFlag_TEACK(USART3))) || (!(LL_USART_IsActiveFlag_REACK(USART3))))
   {
   }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
 
 }
 
@@ -369,17 +570,19 @@ static void MX_GPIO_Init(void)
 {
 
   /* GPIO Ports Clock Enable */
+  LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOF);
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOH);
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOA);
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOB);
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD);
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC);
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG);
-	
-	GPIOC->MODER &= ~(3U<<(2*3));
-	GPIOC->MODER |= (1U<<(2*3));	//set PC2 as output
 
 }
+
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
 
 /**
   * @brief  This function is executed in case of error occurrence.
@@ -387,10 +590,13 @@ static void MX_GPIO_Init(void)
   */
 void Error_Handler(void)
 {
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)
   {
   }
+  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
@@ -403,5 +609,9 @@ void Error_Handler(void)
   */
 void assert_failed(uint8_t *file, uint32_t line)
 {
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
 }
-#endif 
+#endif /* USE_FULL_ASSERT */

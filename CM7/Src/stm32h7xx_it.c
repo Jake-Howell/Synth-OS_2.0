@@ -227,14 +227,10 @@ void TIM3_IRQHandler(void)
 /**
   * @brief This function handles TIM17 global interrupt.
   */
-//void TIM17_IRQHandler(void)
-//{
-//	TIM17->SR &= ~LL_TIM_SR_UIF;	//clear interupt flag
-//	extern _Bool kontinue;
-//	kontinue = 1;
-//	GPIOC->ODR ^= (1<<3);
-
-//}
+void TIM17_IRQHandler(void)
+{
+		
+}
 
 /* USER CODE BEGIN 1 */
 

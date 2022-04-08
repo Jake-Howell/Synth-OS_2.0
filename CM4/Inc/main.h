@@ -74,10 +74,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define STLINK_RX_Pin LL_GPIO_PIN_8
-#define STLINK_RX_GPIO_Port GPIOD
-#define STLINK_TX_Pin LL_GPIO_PIN_9
-#define STLINK_TX_GPIO_Port GPIOD
 #ifndef NVIC_PRIORITYGROUP_0
 #define NVIC_PRIORITYGROUP_0         ((uint32_t)0x00000007) /*!< 0 bit  for pre-emption priority,
                                                                  4 bits for subpriority */

@@ -27,8 +27,6 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32h7xx_ll_dac.h"
-#include "stm32h7xx_ll_spi.h"
 #include "stm32h7xx_ll_rcc.h"
 #include "stm32h7xx_ll_crs.h"
 #include "stm32h7xx_ll_bus.h"
@@ -38,8 +36,6 @@ extern "C" {
 #include "stm32h7xx_ll_utils.h"
 #include "stm32h7xx_ll_pwr.h"
 #include "stm32h7xx_ll_dma.h"
-#include "stm32h7xx_ll_tim.h"
-#include "stm32h7xx_ll_usart.h"
 #include "stm32h7xx_ll_gpio.h"
 
 #if defined(USE_FULL_ASSERT)
@@ -74,10 +70,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define STLINK_RX_Pin LL_GPIO_PIN_8
-#define STLINK_RX_GPIO_Port GPIOD
-#define STLINK_TX_Pin LL_GPIO_PIN_9
-#define STLINK_TX_GPIO_Port GPIOD
 #ifndef NVIC_PRIORITYGROUP_0
 #define NVIC_PRIORITYGROUP_0         ((uint32_t)0x00000007) /*!< 0 bit  for pre-emption priority,
                                                                  4 bits for subpriority */

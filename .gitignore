@@ -7,6 +7,10 @@
 *.o
 *.obj
 
+Drivers/
+
+MDK-ARM/
+
 # Precompiled Headers
 *.gch
 *.pch
@@ -30,3 +34,5 @@
 *.exe
 *.out
 *.app
+*.ioc
+.mxproject
