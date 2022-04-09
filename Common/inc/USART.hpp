@@ -8,7 +8,7 @@
 
 class USART {
 	public:
-	USART(int baudRate, USART_TypeDef * USART_MODULE, GPIO_TypeDef * port, int rx, int tx);
+	USART(USART_TypeDef * USART_MODULE, GPIO_TypeDef * port, int rx, int tx, int baudRate);
 	void init();	
 	char receive();
 	void send(char d);

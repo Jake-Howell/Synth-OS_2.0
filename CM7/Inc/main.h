@@ -25,7 +25,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#define PI 3.141592654
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h7xx_ll_dac.h"
 #include "stm32h7xx_ll_spi.h"

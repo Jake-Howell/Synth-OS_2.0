@@ -1,6 +1,6 @@
 #include "..\..\Common\inc\USART.hpp"
 #include "main.hpp"
-USART::USART(int baudRate, USART_TypeDef * USART_MODULE, GPIO_TypeDef * port, int rx, int tx){
+USART::USART(USART_TypeDef * USART_MODULE, GPIO_TypeDef * port, int rx, int tx, int baudRate){
 	this->baudRate = baudRate;
 	this->USART_MODULE = USART_MODULE;
 	this->USART_PORT = port;
@@ -58,7 +58,7 @@ void USART::init(){
 
 
 char USART::receive(){
-	while(!(USART2->ISR & 0x20)){ 			//check if Receive Not Empty flag is set
+	while(!(USART_MODULE->ISR & 0x20)){ 			//check if Receive Not Empty flag is set
 		__NOP();
 	}
 	return USART_MODULE->RDR;

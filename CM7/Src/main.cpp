@@ -1,12 +1,14 @@
 #include "main.h"
+#include "../../Common/inc/global_defs.hpp"
 #include "../../toneGenerator.cpp"
 #include "../../Common/inc/USART.hpp"
 #include "../../Common/inc/TIMERS.hpp"
 #include "../../Common/inc/MIDI_Decoder.hpp"
+
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
-
+void TIM17_IRQHandler();
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
@@ -18,15 +20,17 @@ static void MX_I2S2_Init(void);
 static void MX_SPI1_Init(void);
 double w(double Hz);
 
-MIDI PC_Keys(USART3, GPIOD, 9,8, 115200);
-Synth synth[10]; //create 10 synths for polyphonic playing
+MIDI Midi;
+Synth synth[10];
 
-bool kontinue = 0;
+bool kontinue = false;
+
+
+
 
 int main(void)
 {
-	//GPIOD->MODER = (0);
-
+	USART PC_Coms(USART3, GPIOD, 9,8, 115200);
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   LL_APB4_GRP1_EnableClock(LL_APB4_GRP1_PERIPH_SYSCFG);
 
@@ -49,37 +53,63 @@ int main(void)
 //  MX_I2S2_Init();
 //  MX_SPI1_Init();
 
-	GPIOC->ODR ^= (1u<<2);
-	
 
+//	while(1){
+//		PC_Coms.print("\r\nSup Dude\r\n");
+//		for(char i = '0'; i <= 'z'; i++){
+//			PC_Coms.send(i);
+//			Wait3_us(1000);
+//		}
+//		Wait3_ms(1000);
+//	}
+	
 	volatile double out;
 	volatile uint16_t DAC_OUTPUT = 0;
-
-	volatile double tick = 0;
+	
+	note_t note = {0};
+	volatile char synthNote = 0;
+	volatile bool synthActive;
+	PC_Coms.print("\r\nSup Dude\r\n");
 	while(1){
-		while (kontinue)
-		{
-			
+
 			for (int i = 0; i < 10; i++){
+				//update variables
+				note = Midi.get_note(i);
+				synthNote = synth[i].getNote();
+				synthActive = synth[i].active_status();
+				
+				if(synthActive == true){
+					if (note.num == 127){		//if note num is OFF_NOTE
+						synth[i].stop();	//turn off wave gen
+					}else if (synthNote == note.num){	//if synth is already playing the correct note, continue
+						continue;
+					}else if (synthNote != note.num){		//if synth is playing a diffrent note to what it should be, update note
+						synth[i].play(note.num, note.velocity);
+					}
+				}else{									//if synth gen is not active
+					if (note.num != 127){
+						synth[i].play(note.num, note.velocity);						
+					}
+					
+				}
+				
 				out += synth[i].waveGen();	//get output from each synth and add it to master out
 			}
 			
 			out = (out > 1.0)?1.0:out;	//hard clipping
 			out = (out < 0.0)? 0:out;
-			kontinue = 0;
+			
 			DAC_OUTPUT = (0xFFF*(uint16_t)out);	//convert to 12bit int
 			
+			
+			while(!kontinue);	//after all calculation complete, wait until next sample flag "kontinue" is set
 			DAC1->DHR12R2 = DAC_OUTPUT;
+			kontinue = false;
 		}
-		__NOP();
-	}
 }
 
-double w(double Hz){
-	return Hz * 2 * PI;
-}
 
-void TIM17_IRQHandler(void) {
+void TIM17_IRQHandler(void){
 	TIM17->SR &= ~LL_TIM_SR_UIF;	//clear interupt flag
 	kontinue = 1;
 }
@@ -289,7 +319,6 @@ static void MX_TIM3_Init(void)
   LL_TIM_SetClockSource(TIM3, LL_TIM_CLOCKSOURCE_INTERNAL);
   LL_TIM_SetTriggerOutput(TIM3, LL_TIM_TRGO_RESET);
   LL_TIM_DisableMasterSlaveMode(TIM3);
-	NVIC_EnableIRQ(TIM3_IRQn);
 	TIM3->CR1|= TIM_CR1_CEN;
 }
 
@@ -339,7 +368,7 @@ static void MX_USART3_UART_Init(void)
 
   USART_InitStruct.PrescalerValue = LL_USART_PRESCALER_DIV1;
   USART_InitStruct.BaudRate = (unsigned int)((double)115200*1.061);	//baud rate * correction
-  USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;	//
+  USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
   USART_InitStruct.StopBits = LL_USART_STOPBITS_2;
   USART_InitStruct.Parity = LL_USART_PARITY_NONE;
   USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
@@ -375,9 +404,6 @@ static void MX_GPIO_Init(void)
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD);
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC);
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG);
-	
-	GPIOC->MODER &= ~(3U<<(2*3));
-	GPIOC->MODER |= (1U<<(2*3));	//set PC2 as output
 
 }
 

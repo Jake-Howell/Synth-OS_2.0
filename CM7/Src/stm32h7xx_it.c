@@ -229,7 +229,10 @@ void TIM3_IRQHandler(void)
   */
 void TIM17_IRQHandler(void)
 {
-		
+	TIM17->SR &= ~LL_TIM_SR_UIF;	//clear interupt flag
+	extern _Bool kontinue;
+	kontinue = 1;
+
 }
 
 /* USER CODE BEGIN 1 */
