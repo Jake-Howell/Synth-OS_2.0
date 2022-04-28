@@ -1,6 +1,14 @@
 #ifndef _GLOBAL_H_
 #define _GLOBAL_H_
 #include "mbed.h"
+
+#define I2S_MODULE SPI3
+#define HW_TIMER_MODULE TIM17
+#define GLOBAL_FLAG_PORT GPIOD
+#define GLOBAL_FLAG_PIN    6
+//#define PULSE_GLOBAL_FLAG()     {FLAG_PORT->BSRR |= (1u<<FLAG_PIN); FLAG_PORT->BSRR |= (1u<<(FLAG_PIN + 16));}
+inline void PULSE_GLOBAL_FLAG()     {GLOBAL_FLAG_PORT->BSRR |= (1u<<GLOBAL_FLAG_PIN); GLOBAL_FLAG_PORT->BSRR |= (1u<<(GLOBAL_FLAG_PIN + 16));}
+
 typedef struct{
 	char type;
 	char param1;
@@ -45,6 +53,8 @@ PA_6,
 PA_5,
 PD_14
 };
+
+
 
 #define SILENT_NOTE 0xFF
 

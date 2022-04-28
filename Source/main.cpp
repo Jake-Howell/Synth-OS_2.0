@@ -1,5 +1,6 @@
 #include "mbed.h"
-//#include "I2S.h"
+#include "global_defs.hpp"
+#include "i2S.h"
 #include "rtos/ThisThread.h"
 #include "HW_Timer.h"
 #include "cbuff.hpp"
@@ -11,7 +12,7 @@
 DigitalOut LED(LED1);
 UnbufferedSerial PC_Coms(USBTX, USBRX);
 
-
+bool SAMPLE_FLAG = 0;
 
 SPI audio_in(adc.MOSI, adc.MISO, adc.SCLK, adc.CS);
 
@@ -22,6 +23,7 @@ Timer sampleTimer_us;
 AnalogOut dac(PA_5);
 WaveGen Synth;
 MIDI Midi;
+I2S AUDIO_OUT(ext_dac.SDAT, ext_dac.LRck, ext_dac.Bclk);
 //Ticker sampleTimer;
 Thread PrintThread, SampleProducerThread, outputStreamThread, MIDI_Thread;
 osThreadId_t mainThreadID, PrintThreadID, SampleProducerThreadID, outputStreamThreadID, MIDI_ThreadID;
@@ -39,7 +41,8 @@ void MIDI_Converter();  //main thread
 
 int main()
 {
-    init_HWTimer_ISR(7, 185); //tested for 96KHz opperation
+    init_HWTimer_ISR(7, 186); //tested for 96KHz opperation
+
     mainThreadID = ThisThread::get_id();
     PC_Coms.baud(115200);
     SystemCoreClockUpdate();
@@ -57,8 +60,8 @@ int main()
     SampleProducerThread.start(sampleGen);              //start sample producer thread
     SampleProducerThread.set_priority(osPriorityHigh);
     
-    //outputStreamThread.start(outputSample);                 //start thread to output to DAC
-    //outputStreamThread.set_priority(osPriorityHigh);   //output must be highest priority to reduce smaple jitter
+    outputStreamThread.start(outputSample);                 //start thread to output to DAC
+    outputStreamThread.set_priority(osPriorityHigh);   //output must be highest priority to reduce smaple jitter
 
     while (true) {
         sleep();
@@ -134,8 +137,10 @@ void outputSample(){
         //wait_ns(10466);
         d = DAC_buffer.get();
         //dac.write(d); //update output
-        PC_Coms.write(&d, 2);
-        PrintQueue.call(printf, "%d",d);
+        while(!SAMPLE_FLAG);
+        AUDIO_OUT.write(3000,3000);
+//        PC_Coms.write(&d, 2);
+//        PrintQueue.call(printf, "%d",d);
     }
 }
 
