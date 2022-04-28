@@ -39,11 +39,11 @@ void MIDI_Converter();  //main thread
 
 int main()
 {
-    //init_HWTimer_ISR(280, 1000);
+    init_HWTimer_ISR(7, 185); //tested for 96KHz opperation
     mainThreadID = ThisThread::get_id();
     PC_Coms.baud(115200);
     SystemCoreClockUpdate();
-    printf("\r\nSystem Core Clock:\t%d MHz\r\n", (SystemCoreClock/1000000));
+    printf("\r\nSystem Core Clck:\t%d MHz\r\n", (SystemCoreClock/1000000));
     int psc = (SystemCoreClock/1000) - 1; //devide clock frequency by 1,000 to get 1ns
     int arr = 10467 -1; //multiply 1ns by 10,467 to get a period of 10.47us, roughly 96KHz
 
