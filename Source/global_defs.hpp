@@ -2,7 +2,7 @@
 #define _GLOBAL_H_
 #include "mbed.h"
 
-#define I2S_MODULE SPI3
+#define I2S_MODULE SPI2
 #define HW_TIMER_MODULE TIM17
 #define GLOBAL_FLAG_PORT GPIOD
 #define GLOBAL_FLAG_PIN    6
@@ -31,6 +31,7 @@ enum MIDI_TYPES
 typedef struct {
     PinName SDAT;
     PinName LRck;
+    PinName Mclk;
     PinName Bclk;
 }I2S_Pins;
 
@@ -42,9 +43,10 @@ typedef struct{
 }SPI_Pins;
 
 const I2S_Pins ext_dac{
-    PB_15,
-    PB_12,
-    PC_6,
+    PB_15,              //I2S2_SDO AF5
+    PB_12,              //I2S2_LR  AF5
+    PC_6,               //
+    PB_13               //I2S2_Ck  AF5
 };
 
 const SPI_Pins adc {

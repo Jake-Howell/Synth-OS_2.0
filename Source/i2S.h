@@ -10,7 +10,7 @@ extern I2S_HandleTypeDef hi2s2;
 
 class I2S{
     public:
-        I2S(PinName sdat_pin, PinName LRsel_pin, PinName clk_pin):sdat(sdat_pin), LRsel(LRsel_pin), clk(clk_pin, 0){
+        I2S(PinName sdat_pin, PinName LRsel_pin, PinName mclk_pin, PinName Bclk_pin):sdat(sdat_pin), LRsel(LRsel_pin), clk(Bclk_pin, 0){
             Init_Pins();
         }
         void MX_I2S2_Init(void){
@@ -53,14 +53,28 @@ class I2S{
 
         }
 
-        void init_I2S(){
+        void init_I2S(PinName sdat_pin, PinName LRsel_pin, PinName mclk_pin, PinName Bclk_pin){
             //Code Derrived from section 55.9.7 I2S Start-up Sequence of the STM32-H7A3 Referance Manual (page 2141) 
-
             const uint8_t I2S_DIV = 2;
-            RCC->APB1LENR |= RCC_APB1LENR_SPI3EN; //turn on perpherial clock
+            RCC->APB1LENR |= RCC_APB1LENR_SPI2EN; //turn on perpherial clock
             I2S_MODULE->CR1 &= ~SPI_CR1_SPE; //reset Serial Peripheral Enable to unlock SPI Registers
+
             
-            //Configure I2S Module
+            //GPIO setup
+            GPIOB->MODER &= ~((3U<<(2*15)) | (3U<<(2*12)) |(3U<<(2*13)));   //reset MODER for port B pins 15, 12 and 13 I2S(SDO, LR, Ck) 
+            GPIOB->MODER |=  (2u<<(2*15)) | (2u<<(2*12)) | (2u<<(2*13));    //set pins as Alternate Function mode (all will be AF5)
+            GPIOC->MODER &= ~(3u<<(2*6));                                   //reset MODER for port C pin 6  I2S(Mclk)
+            GPIOC->MODER |=  (2u<<(2*6));                                   //set alternate function mode
+
+            //AF setup for I2S_2 
+            GPIOB->AFR[1] &= ~((0xF<<28)|(0xF<<16)|(0xF<<20));              //clear AF for Pin B(15, 12 and 13)
+            GPIOB->AFR[1] |=  ((5u<<28)|(5u<<16)|(5u<<20));                 //select AF5 (I2S_2 Mapping) for pins B(15, 12 and 13)
+            GPIOC->AFR[0] &= ~(0xF<<24);                                    //clear AF for Pin C6
+            GPIOC->AFR[0] |=  (5u<<24);                                     //select AF5 (I2S_2 Mapping) for pin C6
+
+
+            
+            //Configure I2S_2 Module
             I2S_MODULE->I2SCFGR |= SPI_I2SCFGR_MCKOE;  //set Master Clock Output Enable, so MClk is produced
             I2S_MODULE->I2SCFGR &= ~SPI_I2SCFGR_CHLEN; //reset chanel length to 0 - this sets chanel length to 16Bits wide
             I2S_MODULE->I2SCFGR &= ~(0xFF << 16);      //reset I2S DIV
@@ -88,7 +102,7 @@ class I2S{
             //enable interupt flags     
             I2S_MODULE->IER |= SPI_IER_TXPIE;           //enable TxP Interupt
 
-            NVIC_EnableIRQ(SPI3_IRQn);
+            NVIC_EnableIRQ(SPI2_IRQn);
 
 
 
