@@ -11,7 +11,8 @@ extern I2S_HandleTypeDef hi2s2;
 class I2S{
     public:
         I2S(PinName sdat_pin, PinName LRsel_pin, PinName mclk_pin, PinName Bclk_pin):sdat(sdat_pin), LRsel(LRsel_pin), clk(Bclk_pin, 0){
-            Init_Pins();
+            //Init_Pins();
+            Init_I2S(sdat_pin, LRsel_pin, mclk_pin, Bclk_pin);
         }
         void MX_I2S2_Init(void){
             hi2s2.Instance = SPI2;
@@ -53,9 +54,10 @@ class I2S{
 
         }
 
-        void init_I2S(PinName sdat_pin, PinName LRsel_pin, PinName mclk_pin, PinName Bclk_pin){
+        void Init_I2S(PinName sdat_pin, PinName LRsel_pin, PinName mclk_pin, PinName Bclk_pin){
             //Code Derrived from section 55.9.7 I2S Start-up Sequence of the STM32-H7A3 Referance Manual (page 2141) 
-            const uint8_t I2S_DIV = 2;
+            const uint8_t I2S_DIV = 1;
+            RCC->AHB4ENR |= RCC_AHB4ENR_GPIOBEN | RCC_AHB4ENR_GPIOCEN; //turn on GPIO busses
             RCC->APB1LENR |= RCC_APB1LENR_SPI2EN; //turn on perpherial clock
             I2S_MODULE->CR1 &= ~SPI_CR1_SPE; //reset Serial Peripheral Enable to unlock SPI Registers
 
@@ -75,23 +77,26 @@ class I2S{
 
             
             //Configure I2S_2 Module
-            I2S_MODULE->I2SCFGR |= SPI_I2SCFGR_MCKOE;  //set Master Clock Output Enable, so MClk is produced
-            I2S_MODULE->I2SCFGR &= ~SPI_I2SCFGR_CHLEN; //reset chanel length to 0 - this sets chanel length to 16Bits wide
+            //I2S_MODULE->I2SCFGR |= SPI_I2SCFGR_MCKOE;  //set Master Clock Output Enable, so MClk is produced
             I2S_MODULE->I2SCFGR &= ~(0xFF << 16);      //reset I2S DIV
-            I2S_MODULE->I2SCFGR |= SPI_I2SCFGR_ODD;    //SET Odd scaling to bring closer to 96KHz Sampling
+            //I2S_MODULE->I2SCFGR |= SPI_I2SCFGR_ODD;    //SET Odd scaling to bring closer to 96KHz Sampling
             I2S_MODULE->I2SCFGR |= (I2S_DIV << 16);    //set I2S DIV
 
             //Program the serial interface protocol
             I2S_MODULE->I2SCFGR &= ~SPI_I2SCFGR_CKPOL;  //reset CKPOL to 0 (clock polarity)
             I2S_MODULE->I2SCFGR &= ~SPI_I2SCFGR_WSINV;  //reset WS inital value to 0
             I2S_MODULE->CFG2 &= ~SPI_CFG2_LSBFRST;      //RESET LSB First to 0
+
             I2S_MODULE->I2SCFGR &= ~SPI_I2SCFGR_CHLEN;  //reset CHLEN to 0 for 16 bits per chanel
+            
             I2S_MODULE->I2SCFGR &= ~(3u<<8);            //reset DATLEN to 0
-            I2S_MODULE->I2SCFGR |= (2u<<8);             //set DATLEN to 2 (32 bit data length)
+            I2S_MODULE->I2SCFGR |=  (0u<<8);            //set DATLEN to 2 (32 bit data length)
+
+
             I2S_MODULE->I2SCFGR &= ~(3u<<4);            //reset I2SSTD to 0 (Philips Standard)
             I2S_MODULE->I2SCFGR &= ~(7u<<1);            //reset I2SCFG to 0 
             I2S_MODULE->I2SCFGR |=  (2u<<1);            //set I2SCFG to 2 (master transmit)
-            I2S_MODULE->I2SCFGR |= (1u<<0);            //set I2SMOD to 1 (MODE SELECTION = I2S)
+            I2S_MODULE->I2SCFGR |=  (1u<<0);            //set I2SMOD to 1 (MODE SELECTION = I2S)
 
             //Adjust FIFO threshold
             I2S_MODULE->CFG1 &= ~(15<<5);               //set 1 data frame per data packet
@@ -102,30 +107,30 @@ class I2S{
             //enable interupt flags     
             I2S_MODULE->IER |= SPI_IER_TXPIE;           //enable TxP Interupt
 
-            NVIC_EnableIRQ(SPI2_IRQn);
+            //NVIC_EnableIRQ(SPI2_IRQn);
 
 
 
             //Start I2S Module
             I2S_MODULE->CR1 |= SPI_CR1_SPE;     //Set Serial Peripheral Enable to lock cfgr registers, and unlock data registers
+            write(0x0F0F, 0x1111);              //ensure buffer is not empty to prevent underrun error
+
             I2S_MODULE->CR1 |= SPI_CR1_CSTART;  //start an I2S communication
+
+            ///*
+            while(1){
+                write(0x0F0F, 0x1111);
+            }
+            //*/
         }
 
-        void write(uint16_t R_data, uint16_t L_data){
-            LRsel = RIGHT; //send right sample first
-            bool d;
-            LR_write(RIGHT);
-            for (int i = 0; i<16; i++){        //loop through 16 bit data lsb first
-                d = (((R_data)&(1u<<i))>>i);
-                sdat_write(d); //mask with (1 << i) to extract bit at position i, then shift bit to pos 0 before writing output.
-                pulse_clk();
-            }
-            LR_write(LEFT);
-            for (int i = 0; i<16; i++){        //loop through 16 bit data lsb first
-                d = (((L_data)&(1u<<i))>>i);
-                sdat_write(d); //mask with (1 << i) to extract bit at position i, then shift bit to pos 0 before writing output.
-                pulse_clk();
-            }
+        void write(uint16_t L_data, uint16_t R_data){
+            
+            while(!(I2S_MODULE->SR & SPI_SR_TXP));
+            I2S_MODULE->TXDR = L_data;
+            while(!(I2S_MODULE->SR & SPI_SR_TXP));
+            I2S_MODULE->TXDR = R_data;
+            
         }
 
     private:
