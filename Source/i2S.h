@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "global_defs.hpp"
 
+/*
 typedef enum {LEFT = 0, RIGHT} LR_SELECT; //enum to describe left and right output for sterio output
 extern I2S_HandleTypeDef hi2s2;
 
@@ -12,27 +13,9 @@ class I2S{
     public:
         I2S(PinName sdat_pin, PinName LRsel_pin, PinName mclk_pin, PinName Bclk_pin):sdat(sdat_pin), LRsel(LRsel_pin), clk(Bclk_pin, 0){
             //Init_Pins();
-            Init_I2S(sdat_pin, LRsel_pin, mclk_pin, Bclk_pin);
+            //Init_I2S(sdat_pin, LRsel_pin, mclk_pin, Bclk_pin);
         }
-        void MX_I2S2_Init(void){
-            hi2s2.Instance = SPI2;
-            hi2s2.Init.Mode = I2S_MODE_MASTER_TX;
-            hi2s2.Init.Standard = I2S_STANDARD_PHILIPS;
-            hi2s2.Init.DataFormat = I2S_DATAFORMAT_16B_EXTENDED;
-            hi2s2.Init.MCLKOutput = I2S_MCLKOUTPUT_ENABLE;
-            hi2s2.Init.AudioFreq = I2S_AUDIOFREQ_44K;
-            hi2s2.Init.CPOL = I2S_CPOL_LOW;
-            hi2s2.Init.FirstBit = I2S_FIRSTBIT_MSB;
-            hi2s2.Init.WSInversion = I2S_WS_INVERSION_DISABLE;
-            hi2s2.Init.Data24BitAlignment = I2S_DATA_24BIT_ALIGNMENT_RIGHT;
-            hi2s2.Init.MasterKeepIOState = I2S_MASTER_KEEP_IO_STATE_DISABLE;
-            if (HAL_I2S_Init(&hi2s2) != HAL_OK)
-            {
-                while(1){
-                    //Well, something went wrong here...
-                }
-            }
-        }
+
 
         void Init_Pins(){
             
@@ -121,7 +104,7 @@ class I2S{
             while(1){
                 write(0x0F0F, 0x1111);
             }
-            //*/
+            
         }
 
         void write(uint16_t L_data, uint16_t R_data){
@@ -155,5 +138,5 @@ class I2S{
             GPIOC->BSRR |= (1U<<(Bclk+16)); //reset Bclk
         }
 };
-
+//*/
 #endif

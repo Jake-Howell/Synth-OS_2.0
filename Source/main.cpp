@@ -1,6 +1,6 @@
 #include "mbed.h"
 #include "global_defs.hpp"
-#include "i2S.h"
+//#include "i2S.h"
 #include "rtos/ThisThread.h"
 #include "HW_Timer.h"
 #include "cbuff.hpp"
@@ -13,26 +13,26 @@
 DigitalOut LED(LED1);
 UnbufferedSerial PC_Coms(USBTX, USBRX);
 
-bool SAMPLE_FLAG = 0;
+
 
 SPI audio_in(adc.MOSI, adc.MISO, adc.SCLK, adc.CS);
 
 
 
-Circular_Buff<uint16_t> DAC_buffer(1024);
-Timer sampleTimer_us;
+Circular_Buff<float> DAC_buffer(2048);
+
 AnalogOut dac(PA_5);
 WaveGen Synth;
 MIDI Midi;
-I2S AUDIO_OUT(ext_dac.SDAT, ext_dac.LRck, ext_dac.Mclk, ext_dac.Bclk);
+
 RotaryEncoder RE_D(RE_D_Pins);
-//Ticker sampleTimer;
-Thread PrintThread, SampleProducerThread, outputStreamThread, MIDI_Thread, IOCheckThread;
-osThreadId_t mainThreadID, PrintThreadID, SampleProducerThreadID, outputStreamThreadID, MIDI_ThreadID;
 
+Thread PrintThread, SampleProducerThread, outputStreamThread(osPriorityRealtime), MIDI_Thread, IOCheckThread;
+osThreadId_t PrintThreadID, mainThreadID, SampleProducerThreadID, outputStreamThreadID, MIDI_ThreadID;
 
+EventQueue SampleQueue;
 EventQueue PrintQueue;
-
+Ticker sampleTimer;
 
 //Callback functions
 void printer();
@@ -41,37 +41,48 @@ void outputSample();    //outputStream thread callback
 void getUserInput();    //usart interupt callback
 void MIDI_Converter();  //main thread
 void updateIO();
+void timerCallback();
+void output();
 
 int main()
 {
-    init_HWTimer_ISR(7, 186); //tested for 96KHz opperation
-
+    
+    /*
+    while(1){
+        dac.write(1.0f);
+        ThisThread::sleep_for(10ms);
+        dac.write(0.0f);
+        ThisThread::sleep_for(10ms);
+    }
+    //*/
+    DAC_buffer.setThreshold(1024);
+    //init_HWTimer_ISR();
     mainThreadID = ThisThread::get_id();
     PC_Coms.baud(115200);
     SystemCoreClockUpdate();
     printf("\r\nSystem Core Clck:\t%d MHz\r\n", (SystemCoreClock/1000000));
-    int psc = (SystemCoreClock/1000) - 1; //devide clock frequency by 1,000 to get 1ns
-    int arr = 10467 -1; //multiply 1ns by 10,467 to get a period of 10.47us, roughly 96KHz
-
 
     //init_HWTimer_ISR(psc, arr);
     PC_Coms.attach(&getUserInput, SerialBase::RxIrq);   //call get user input on usart rx interupt 
+
+    //start print queue
     PrintThread.start(printer);
 
+
+    //start updating IO 
     IOCheckThread.start(updateIO);
-    IOCheckThread.set_priority(osPriorityHigh);
 
-    /*
+    //start converting MIDI data to control device
     MIDI_Thread.start(MIDI_Converter);
-    MIDI_Thread.set_priority(osPriorityHigh);
     
+    //start producing samples (High Priority thread)
     SampleProducerThread.start(sampleGen);              //start sample producer thread
-    SampleProducerThread.set_priority(osPriorityHigh);
     
-    outputStreamThread.start(outputSample);                 //start thread to output to DAC
-    outputStreamThread.set_priority(osPriorityHigh);   //output must be highest priority to reduce smaple jitter
+    //start outputting samples (High Priority thread)
+    outputStreamThread.start(output);                 //start thread to output to DAC
     //*/
-
+    sampleTimer.attach(timerCallback, 20ms);
+    
 
     while (true) {
         sleep();
@@ -84,7 +95,7 @@ void updateIO(){
         RE_D.update_pos();
         uint8_t pos = RE_D.getPos();
         uint8_t GC = RE_D.getGC();
-        printf("RE_D Pos: %d\tGC: %d\r\n", pos, GC);
+        PrintQueue.call(printf,"RE_D Pos: %d\tGC: %d\r\n", pos, GC);
         ThisThread::sleep_for(50ms);
     }
 }
@@ -109,12 +120,12 @@ void MIDI_Converter(){
     while(true){  //loop until buffer is empty
         //wait for signal to produce more samples
         ThisThread::flags_wait_any(1);
-        while(!Midi.serialBuffer.isEmpty()){
-            d = Midi.serialBuffer.get();      
-            cmd = Midi.pc_keyMap(d);          //turn keyboard chars into midi data and return midi cmd
+        while(!Midi.serialBuffer.isEmpty()){  //while MIDI buffer not empty
+            d = Midi.serialBuffer.get();      //get char of midi buffer
+            cmd = Midi.pc_keyMap(d);          //turn PC keyboard chars into midi data and return midi cmd
         }
         PrintQueue.call(printf, "Note: %d Vel: %d\r\n", cmd.param1, cmd.param2);
-        Synth.readMIDI(cmd);    //add midi data to synth
+        Synth.readMIDI(cmd);    //send midi data to synth
     }
 }
 
@@ -123,47 +134,50 @@ void MIDI_Converter(){
 void sampleGen(){
     SampleProducerThreadID = ThisThread::get_id();
     PrintQueue.call(printf, "Starting sampleGen\r\n");
+    
     //SampleProducerThread.flags_set(1);  //on boot, fill buffer
+    float sample;
     while(true){
         //wait for outputStream to ask for more samples
         
         //PrintQueue.call(printf, "SampleGen producing samples\r\n");
-        printf("Producing samples\r\n");
         while(!DAC_buffer.isFull()){    //loop until dac buffer is full
-            uint16_t out_16Bit = (uint16_t)Synth.produceSample();
-            DAC_buffer.put(out_16Bit);               //put sample on buffer
+            sample = Synth.produceSample();
+            DAC_buffer.put(sample);               //put sample on buffer
         }
-        //PrintQueue.call(printf, "DAC buffer full\r\n");
-        printf("DAC Buffer Full\r\n");
-        ThisThread::flags_wait_any(1);
-        ThisThread::flags_clear(1);     //once buffer is full, clear flag
+        PrintQueue.call(printf, "DAC buffer full. Latest Sample: %5.4f\r\n", sample);
+        dac.write(sample);
+        ThisThread::flags_clear(BUFFER_BELOW_THRESHOLD);     //once buffer is full, clear flag
+        ThisThread::flags_wait_any(BUFFER_BELOW_THRESHOLD);  //once buffer is full, sleep until buffer threshold flag set
     }
 }
 
-//TODO make this work id us_ticker
-//highest priority, outputStream thread callback
+
+//outputSample callback for sample event queue
 void outputSample(){
-    outputStreamThreadID = ThisThread::get_id();
-    uint16_t d;
-    DAC_buffer.setThreshold(512);       //set threshold, if size is less than threshold, signal sampleGen to produce more samples
-    PrintQueue.call(printf, "Starting outputSample\r\n");
+    volatile float OutSample;
 
-    while(true){
-        
-        if (DAC_buffer.belowThreshold()){ //if output buffer is too small, signal sampleGen to produce more samples 
-            SampleProducerThread.flags_set(1); //signal sampleGen to produce more samples
-            PrintQueue.call(printf, "sampleGen Signaled\r\n");
-        }
-
-        //wait_ns(10466);
-        d = DAC_buffer.get();
-        AUDIO_OUT.put(d, d/2);
-        //dac.write(d); //update output
-        while(!SAMPLE_FLAG);
-        AUDIO_OUT.pop();
-//        PC_Coms.write(&d, 2);
-//        PrintQueue.call(printf, "%d",d);
+    if (DAC_buffer.belowThreshold()){ //if output buffer is too small, signal sampleGen to produce more samples 
+        SampleProducerThread.flags_set(BUFFER_BELOW_THRESHOLD); //signal sampleGen to produce more samples
+        PrintQueue.call(printf, "sampleGen Signaled\r\n");
     }
+    
+    OutSample = DAC_buffer.get();
+    PrintQueue.call(printf, "Dac Sample:\t%5.4f\r\n", OutSample);
+    dac.write(OutSample);
+}
+
+void timerCallback(){
+    //outputStreamThread.flags_set(SAMPLE_FLAG);
+    //osSignalSet(outputStreamThreadID, SAMPLE_FLAG);
+    SampleQueue.call(outputSample);
+
+}
+
+void output(){
+    outputStreamThreadID = ThisThread::get_id();
+    PrintQueue.call(printf, "Starting output\r\n");
+    SampleQueue.dispatch_forever();
 }
 
 void printer(){
@@ -171,5 +185,6 @@ void printer(){
     PrintQueue.call(printf, "Starting printer\r\n");
     PrintQueue.dispatch_forever();
 }
+
 
 

@@ -5,6 +5,7 @@
 #include "stdlib.h"
 #include <vector>
 #include "global_defs.hpp"
+#include "cbuff.hpp"
 
 #define PI 3.141592654
 #define OFF 127
@@ -20,11 +21,13 @@ class WaveGen{
 		setSampleRate(96000);	//set sample rate and calculate sample period
 		setWaveRes(1024);			//calculate 1024 points in sine wave
 		setWaveType(SIN);			//set wave type to SINE by default
+        pressNote(55, 120);
+        pressNote(53,100);
 	}
 	
 	void setSampleRate(unsigned int rate){
 		this->mSampleRate = rate;														//set sample rate
-		this->mSamplePeriod_us = 1000000.0/((double)rate);	//recalculate sample period
+		this->mSamplePeriod_us = 1000000.0/((float)rate);	//recalculate sample period
 	}
 	
 	unsigned int getSampleRate(){
@@ -33,10 +36,10 @@ class WaveGen{
 	
 	void setWaveRes(unsigned int res){	//set wave resoloution up to 1024 (size of sine table array limits this)
 		this->mWaveRes = (res <= 1024)? res : 1024;	//bound res to upper limit of 1023
-		double angle;
+		float angle;
 		for (int x = 0; x < mWaveRes; x++){		//
-			angle = ((double)x/mWaveRes)*(2*PI);				//calculate angle increment
-			mSineTable[x] = std::sin(angle);		//generate wavetable
+			angle = ((float)x/mWaveRes)*(2*PI);				//calculate angle increment
+			mSineTable[x] = (std::sinf(angle)+1.0f)/2;		//generate wavetable
 		}
 	}
 	
@@ -51,15 +54,17 @@ class WaveGen{
 
 	void pressNote(char noteNum, char velocity){	//add note to wave gen, and turn on wave gen
         toneParams note;
-		double step = 0.0;
+		float step = 0.0;
 		note.MIDInum = noteNum;
 		note.period_us = note_periods_us[noteNum];					//select note period using MIDI note index
+        note.Wo = 0.0f;
 		step = mSamplePeriod_us/note.period_us;						//Calculate how much each time step (samplePeriod) changes the angle
-		note.velocity = ((double)velocity/127);							//calculate velocity multiplier
+		note.velocity = ((float)velocity/127);							//calculate velocity multiplier
 		note.angularStep = step*(mWaveRes - 1);												//denormalise angular step to produce an index for sineTable
 		note.active = true;																//turn the wave generator on
 		
         playList.push_back(note);
+        //playList.put(note);
 	}
 
     void releaseNote(int MIDInum){
@@ -94,57 +99,65 @@ class WaveGen{
 
     }
 	
-	double produceSample(){
+	float produceSample(){
         toneParams note; 
+		volatile float sample = 0.0f;	//if note is NOT active, output will remain 0.0
 
-		double out = 0.0;	//if note is NOT active, output will remain 0.0
-        for(int i; i < playList.size(); i++){
+        for(int i = 0; i < playList.size(); i++){
             note = playList.at(i);  //read the next note on the play list
             if(note.active){	//if note is on, calculate the next output
                 note.Wo += note.angularStep;	//increment angle
-                note.Wo = (note.Wo > ((double)(mWaveRes - 1)))?(note.Wo - ((double)(mWaveRes - 1))):(note.Wo); //bound angle to limits
+                note.Wo = (note.Wo > ((float)(mWaveRes - 1)))?(note.Wo - ((float)(mWaveRes - 1))):(note.Wo); //bound angle to limits
                 switch(mWaveType){
                     case SIN:
-                        out = mSineTable[(int)note.Wo];											//round angle to nearest intager within wave resoloution and multiply by velocity
+                        sample += (mSineTable[(int)note.Wo])*note.velocity;	//round angle to nearest intager within wave resoloution and multiply by velocity
                         break;
                     case TRI:
-                        out = (note.Wo >= (double)mWaveRes/2)?(2*(note.Wo/(mWaveRes-1))):(-2*(note.Wo/(mWaveRes-1)));   //convert sine to triangle wave
+                        sample += ((note.Wo >= (float)mWaveRes/2)?(2*(note.Wo/(mWaveRes-1))):(-2*(note.Wo/(mWaveRes-1))))*note.velocity;   //convert sine to triangle wave
                         break;
                     
                     case SAW:
-                        out = note.Wo/(mWaveRes-1);                                                             //convert sine to saw
+                        sample += (note.Wo/(mWaveRes-1))*note.velocity;                                                             //convert sine to saw
                         break;
                     
                     case SQU:
-                        out = (note.Wo >= (double)mWaveRes/2)?1:0;                                                      //convert sine to square
+                        sample += ((note.Wo >= (float)mWaveRes/2)?1:0)*note.velocity;                                                      //convert sine to square
                         break;
                 }
+                playList.erase(playList.begin() + i );         //remove old note from playlist
+                playList.insert(playList.begin() + i,note);    //insert modified note back into playlist
+                //printf("Note: %d\tWo: %5.4f\tout: %5.4f \r\n", note.MIDInum, note.Wo,out);
             }
         }
-		return note.velocity*out;   //return output after scaling
+        //Master Clipping
+        sample = (sample/playList.size());
+        sample = (sample > 1.0f)?1.0f:sample;
+        sample = (sample < 0.0f)?0.0f:sample;
+		return sample;   //return output after scaling
 	}
 	
 	private:
         typedef struct{
             bool    active;         //if note is not active, skip any calculations
-            double  angularStep;    //calculated angular step per sample
-            double  Wo;             //angular velocity
+            float  angularStep;    //calculated angular step per sample
+            float  Wo;             //angular velocity
             char    MIDInum;        //MIDI code for note
-            double  period_us;      //wavelength
-            double  velocity;       //loudness of note (gain)
+            float  period_us;      //wavelength
+            float  velocity;       //loudness of note (gain)
             
         }toneParams;
 
         vector<toneParams> playList;        //create a list of waveforms to add to sample
+        //Circular_Buff<toneParams> playList;
         char mPitchwheel;
         //Synth Params
         unsigned int mSampleRate = 96000;   //96KHz sample rate
-        double mSamplePeriod_us;            //10.41667 us @ 96KHz
+        float mSamplePeriod_us;            //10.41667 us @ 96KHz
         WAVE_TYPE mWaveType;                //Type of wave to be generated (SIN, SAW, TRI, SQU)
 		unsigned int mWaveRes = 1024;       //resoloution of wave table
-		double mSineTable[1024];		    //sinetable from 0 to 90 degrees
+		float mSineTable[1024];		    //sinetable from 0 to 90 degrees
 
-		double note_periods_us[121] = {
+		float note_periods_us[121] = {
 					65160,//C0		0
 					57720,//C#0		1
 					54480,//D0		2
