@@ -20,7 +20,7 @@ SPI audio_in(adc.MOSI, adc.MISO, adc.SCLK, adc.CS);
 
 
 
-Circular_Buff<float> DAC_buffer(1024);
+Circular_Buff<float> DAC_buffer(BUFFER_SIZE);
 
 //AnalogOut dac(PA_5);
 BM_DAC dac('A', 5);
@@ -66,10 +66,12 @@ int main()
     SystemCoreClockUpdate();
     printf("\r\nSystem Core Clck:\t%d MHz\r\n", (SystemCoreClock/1000000));
 
-    Synth.pressNote(55, 120);
+    //Synth.pressNote(55, 120);
     Synth.pressNote(70,100);
+//    Synth.pressNote(72,100);
+//    Synth.pressNote(73,100);
     PC_Coms.attach(&getUserInput, SerialBase::RxIrq);   //call get user input on usart rx interupt 
-
+    DAC_buffer.setThreshold(BUFFER_SIZE/2);
 
     //start print queue
     PrintThread.start(printer);
@@ -92,7 +94,7 @@ int main()
     init_HWTimer_ISR(SAMPLE_RATE);
     NVIC_SetVector(HW_TIMER_IRQn, (uint32_t)&HW_TIMER_Callback); //point HW Timer to ISR
 
-    //oscR WAS HWERE AND STRUGGLING TO TYPE
+
     while (true) {
         sleep();
     }
@@ -102,13 +104,16 @@ int main()
 void HW_TIMER_Callback(){
     static uint16_t sample = 0;
     bool err;
-    HW_TIMER_MODULE->SR &= ~TIM_SR_UIF;    //clear interupt flag
     //outputStreamThread.flags_set(SAMPLE_FLAG);
-    PULSE_GLOBAL_FLAG();
+    //PULSE_GLOBAL_FLAG();
     sample = (uint16_t)(4095*DAC_buffer.nbGet(&err));
     //sample = (sample + 1)  & 0x0FFF;
-    //dac.write(sample);
-    DAC->DHR12R2=(sample & 0x0FFF);
+    dac.write(sample);
+    if(DAC_buffer.belowThreshold()){
+        SampleProducerThread.flags_set(BUFFER_BELOW_THRESHOLD);
+    }
+    HW_TIMER_MODULE->SR &= ~TIM_SR_UIF;    //clear interupt flag
+    //DAC->DHR12R2=(sample & 0x0FFF);
 }
 
 void updateIO(){
@@ -165,11 +170,11 @@ void sampleGen(){    //FIFO Producer Thread
         while(!DAC_buffer.isFull()){    //loop until dac buffer is full
             sample = Synth.produceSample();
             DAC_buffer.put(sample);               //put sample on buffer
+            TOGGLE_GLOBAL_FLAG();
         }
-        PrintQueue.call(printf, "DAC buffer full. Latest Sample: %5.4f\r\n", sample);
-        //dac.write(sample);
+        
         ThisThread::flags_clear(BUFFER_BELOW_THRESHOLD);     //once buffer is full, clear flag
-        ThisThread::flags_wait_any(BUFFER_BELOW_THRESHOLD);  //once buffer is full, sleep until buffer threshold flag set
+        ThisThread::flags_wait_all(BUFFER_BELOW_THRESHOLD);  //once buffer is full, sleep until buffer threshold flag set
     }
 }
 
