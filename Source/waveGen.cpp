@@ -17,12 +17,10 @@ class WaveGen{
 	public:
 	enum WAVE_TYPE{SIN = 0, TRI, SAW, SQU};	
 	
-	WaveGen(){
-		setSampleRate(96000);	//set sample rate and calculate sample period
+	WaveGen(unsigned int sampleRate){
+		setSampleRate(sampleRate);	//set sample rate and calculate sample period
 		setWaveRes(1024);			//calculate 1024 points in sine wave
 		setWaveType(SIN);			//set wave type to SINE by default
-        pressNote(55, 120);
-        pressNote(53,100);
 	}
 	
 	void setSampleRate(unsigned int rate){

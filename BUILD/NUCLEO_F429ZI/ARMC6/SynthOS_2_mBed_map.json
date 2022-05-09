@@ -1,5 +1,27 @@
 [
     {
+        "module": "Source\\BM_DAC.o",
+        "size": {
+            ".text": 336,
+            ".data": 0,
+            ".bss": 0,
+            ".text-delta": 0,
+            ".data-delta": 0,
+            ".bss-delta": 0
+        }
+    },
+    {
+        "module": "Source\\HW_Timer.o",
+        "size": {
+            ".text": 110,
+            ".data": 0,
+            ".bss": 0,
+            ".text-delta": 0,
+            ".data-delta": 0,
+            ".bss-delta": 0
+        }
+    },
+    {
         "module": "Source\\MIDI_Decoder.o",
         "size": {
             ".text": 650,
@@ -13,10 +35,10 @@
     {
         "module": "Source\\main.o",
         "size": {
-            ".text": 7189,
+            ".text": 6456,
             ".data": 0,
-            ".bss": 6616,
-            ".text-delta": 0,
+            ".bss": 6264,
+            ".text-delta": 12,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -101,7 +123,7 @@
     {
         "module": "mbed-os\\connectivity",
         "size": {
-            ".text": 3215,
+            ".text": 3197,
             ".data": 0,
             ".bss": 12724,
             ".text-delta": 0,
@@ -112,7 +134,7 @@
     {
         "module": "mbed-os\\drivers",
         "size": {
-            ".text": 4208,
+            ".text": 4008,
             ".data": 0,
             ".bss": 1780,
             ".text-delta": 0,
@@ -134,7 +156,7 @@
     {
         "module": "mbed-os\\hal",
         "size": {
-            ".text": 2156,
+            ".text": 2066,
             ".data": 4,
             ".bss": 58,
             ".text-delta": 0,
@@ -145,7 +167,7 @@
     {
         "module": "mbed-os\\platform",
         "size": {
-            ".text": 6612,
+            ".text": 6588,
             ".data": 64,
             ".bss": 285,
             ".text-delta": 0,
@@ -167,9 +189,9 @@
     {
         "module": "mbed-os\\targets",
         "size": {
-            ".text": 16640,
+            ".text": 15655,
             ".data": 9,
-            ".bss": 760,
+            ".bss": 758,
             ".text-delta": 0,
             ".data-delta": 0,
             ".bss-delta": 0
@@ -177,10 +199,10 @@
     },
     {
         "summary": {
-            "static_ram": 33962,
+            "static_ram": 33608,
             "static_ram_delta": 0,
-            "total_flash": 70366,
-            "total_flash_delta": 0
+            "total_flash": 68762,
+            "total_flash_delta": 12
         }
     }
 ]

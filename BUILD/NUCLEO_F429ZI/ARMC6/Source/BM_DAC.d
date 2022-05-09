@@ -1,6 +1,6 @@
-BUILD\NUCLEO_F429ZI\ARMC6\Source\main.o: Source\main.cpp \
-  BUILD\NUCLEO_F429ZI\ARMC6\mbed_config.h mbed-os\mbed.h \
-  mbed-os\platform\include\platform\mbed_version.h \
+BUILD\NUCLEO_F429ZI\ARMC6\Source\BM_DAC.o: Source\BM_DAC.cpp \
+  BUILD\NUCLEO_F429ZI\ARMC6\mbed_config.h Source\BM_DAC.hpp \
+  mbed-os\mbed.h mbed-os\platform\include\platform\mbed_version.h \
   mbed-os\rtos\include\rtos\rtos.h \
   mbed-os\rtos\include\rtos\internal\mbed_rtos_storage.h \
   mbed-os\cmsis\device\rtos\include\mbed_rtx_storage.h \
@@ -312,6 +312,4 @@ BUILD\NUCLEO_F429ZI\ARMC6\Source\main.o: Source\main.cpp \
   mbed-os\platform\include\platform\ScopedRamExecutionLock.h \
   mbed-os\platform\include\platform\mbed_stats.h \
   mbed-os\platform\include\platform\Stream.h \
-  mbed-os\platform\include\platform\FileLike.h Source\global_defs.hpp \
-  Source\BM_DAC.hpp Source\HW_Timer.h Source\cbuff.hpp \
-  Source\waveGen.cpp Source\MIDI_Decoder.hpp Source\RotaryEncoder.h
+  mbed-os\platform\include\platform\FileLike.h

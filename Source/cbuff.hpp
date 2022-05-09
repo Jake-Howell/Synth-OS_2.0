@@ -29,6 +29,7 @@ class Circular_Buff{
         T peek(unsigned int index);     //look inside buffer without changing it
         void replace(unsigned int index, T sample);
         T get();                  //get the oldest sample from the buffer 
+        T nbGet(bool *err);
         void    reset();                //clear the buffer
         bool    isEmpty() const;        //check if empty
         bool    isFull() const;         //check if full
@@ -115,6 +116,14 @@ T Circular_Buff<T>::get(){                                  //get last sample an
     tail = (tail + 1) % max_size;                               //increment tail (includes wrapping so pointer stays within arrays limits)
     
     return sample;                                              //return sample
+}
+template<class T>
+T Circular_Buff<T>::nbGet(bool *err){
+    T sample = buffer[tail];
+    *err = isEmpty();
+    curr_size--;
+    tail = (tail + 1) % max_size;
+    return sample;
 }
 template<class T>
 void Circular_Buff<T>::reset(){                                    //move head and tail to same position and reset current size. (emptying buffer)
