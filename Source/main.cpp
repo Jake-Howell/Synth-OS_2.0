@@ -13,7 +13,8 @@
 #include <cstdio>
 #include <stdint.h>
 DigitalOut LED(LED1);
-UnbufferedSerial PC_Coms(USBTX, USBRX);
+UnbufferedSerial PC_Coms(USBTX, USBRX, 115200);
+UnbufferedSerial RPi_Coms(PD_5, PD_6, 115200);
 
 SPI audio_in(adc.MOSI, adc.MISO, adc.SCLK, adc.CS);
 
@@ -32,30 +33,24 @@ osThreadId_t PrintThreadID, mainThreadID, SampleProducerThreadID, outputStreamTh
 EventQueue PrintQueue;
 Ticker sampleTimer;
 
-//Callback functions
-void printer();
-void sampleGen();   //SampleProducer thread callback
-void outputSample();    //outputStream thread callback
-void getUserInput();    //usart interupt callback
-void MIDI_Converter();  //main thread
-void updateIO();
-void timerCallback();
+//ISR Callback functions
+void getUserInput();    
 void HW_TIMER_Callback();
+
 
 int main()
 {
     INIT_GLOBAL_FLAG();
 
     mainThreadID = ThisThread::get_id();
-    PC_Coms.baud(115200);
     SystemCoreClockUpdate();
     printf("\r\nSystem Core Clck:\t%d MHz\r\n", (SystemCoreClock/1000000));
 
-    Synth.pressNote(70,100);
-//    Synth.pressNote(72,100);
+    //8Synth.pressNote(50,100);
+
 //    Synth.pressNote(73,100);
-    PC_Coms.attach(&getUserInput, SerialBase::RxIrq);   //call get user input on usart rx interupt 
-    DAC_buffer.setThreshold(BUFFER_SIZE/2);
+    RPi_Coms.attach(&getUserInput, SerialBase::RxIrq);   //call get user input on usart rx interupt 
+    DAC_buffer.setThreshold((BUFFER_SIZE-1));
 
     start_threads();
 
@@ -87,8 +82,11 @@ void HW_TIMER_Callback(){
 void getUserInput(){
     char d;
 
-    PC_Coms.read(&d, 1);    //copy data from UART Reg to char d
-    PC_Coms.write(&d, 1);
-    MIDI_Thread.flags_set(1);   //signal MIDI Converter, to start converting data
+    RPi_Coms.read(&d, 1);    //copy data from UART Reg to char d
+    //PC_Coms.write(&d, 1);
+    //PrintQueue.call(printf, "MIDI Data: %d\r\n", d);
     Midi.serialBuffer.put(d);   //put data onto buffer
+    if (Midi.serialBuffer.size() >= 4){
+        MIDI_Thread.flags_set(MIDI_DATA_READY);   //signal MIDI Converter, to start converting data
+    }
 }

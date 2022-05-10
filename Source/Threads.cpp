@@ -42,17 +42,25 @@ void sampleGen(){    //FIFO Producer Thread
 //convert serial data into midi commands
 void MIDI_Converter(){
     MIDI_ThreadID = ThisThread::get_id();
-    char d;
+
     MIDI_cmd_t cmd;
+    MIDI_Serial_Bloak_t chunk;  //store 4 bytes of midi data to convert to a command
     while(true){  //loop until buffer is empty
-        //wait for signal to produce more samples
-        ThisThread::flags_wait_any(1);
-        while(!Midi.serialBuffer.isEmpty()){  //while MIDI buffer not empty
-            d = Midi.serialBuffer.get();      //get char of midi buffer
-            cmd = Midi.pc_keyMap(d);          //turn PC keyboard chars into midi data and return midi cmd
+        //wait for signal to decode more cmds
+        ThisThread::flags_wait_all(MIDI_DATA_READY);
+        while(Midi.serialBuffer.size() >= 4){           //while MIDI buffer not empty
+            chunk.d0 = Midi.serialBuffer.get();         //get char of midi buffer
+            chunk.d1 = Midi.serialBuffer.get();         //get char of midi buffer
+            chunk.d2 = Midi.serialBuffer.get();         //get char of midi buffer
+            chunk.cs = Midi.serialBuffer.get();         //get char of midi buffer 
+            Midi.serialToMIDIconverter(chunk);
+            //cmd = Midi.pc_keyMap(d);          //turn PC keyboard chars into midi data and return midi cmd
         }
-        PrintQueue.call(printf, "Note: %d Vel: %d\r\n", cmd.param1, cmd.param2);
-        Synth.readMIDI(cmd);    //send midi data to synth
+        if(!(Midi.cmdBuffer.isEmpty())){    //if data has been converted and tansmitted correctly
+            cmd = Midi.cmdBuffer.get();     //get cmd
+            Synth.readMIDI(cmd);            //send midi cmd to synth
+        }
+        
     }
 }
 

@@ -30,11 +30,12 @@ class Circular_Buff{
         void replace(unsigned int index, T sample);
         T get();                  //get the oldest sample from the buffer 
         T nbGet(bool *err);
+        T& ref(unsigned int index);  //get pointer to sample in memory
         void    reset();                //clear the buffer
         bool    isEmpty() const;        //check if empty
         bool    isFull() const;         //check if full
         size_t  getCapacity() const;    //returns max capacity 
-        size_t  getSize() const;        //returns current number of samples in buffer
+        size_t  size() const;        //returns current number of samples in buffer
         void setThreshold(int threshold){
             this->threshold = threshold;
         }
@@ -96,6 +97,14 @@ T Circular_Buff<T>::peek(unsigned int index){               //allow external fun
 
     return sample;
 }
+
+template<class T>
+T& Circular_Buff<T>::ref(unsigned int index){
+    int i = (tail + index);
+    return buffer[i];
+}
+
+
 template<class T>
 void  Circular_Buff<T>::replace(unsigned int index, T sample){
     int i = head - index;
@@ -107,9 +116,6 @@ T Circular_Buff<T>::get(){                                  //get last sample an
     
     while(isEmpty()){                                              //check if the buffer is empty before getting sample from buffer
         PrintQueue.call(printf, "Buffer Underrun\tThread ID: %d\t Thread Name: %s\r\n", (int)ThisThread::get_id(), ThisThread::get_name());
-        
-        //TODO Call error handeler "Buffer underrun"
-        //return sample_t();                                      //return empty sample
     }
     T sample = buffer[tail];                             //if buffer is not empty, return sample from buffer's tail
     curr_size--;                                                //subtract 1 from current size
@@ -134,7 +140,7 @@ void Circular_Buff<T>::reset(){                                    //move head a
 }
 template<class T>
 bool Circular_Buff<T>::isEmpty() const{                            //check if buffer is empty (for use external to the class)
-    return (curr_size == 0);                                    //check size 
+    return (head == tail);                                    //check size 
 }
 template<class T>
 bool Circular_Buff<T>::isFull() const{                             //check if buffer is full (for use external to the class)
@@ -145,7 +151,7 @@ size_t Circular_Buff<T>::getCapacity() const{                      //return capa
     return max_size;                                            //return size of buffer 
 }
 template<class T>
-size_t Circular_Buff<T>::getSize() const{                          //return the current size of the buffer (for external use to the class)
+size_t Circular_Buff<T>::size() const{                          //return the current size of the buffer (for external use to the class)
     return curr_size;                               
 }
 

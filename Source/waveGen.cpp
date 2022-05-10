@@ -21,6 +21,8 @@ class WaveGen{
 		setSampleRate(sampleRate);	//set sample rate and calculate sample period
 		setWaveRes(1024);			//calculate 1024 points in sine wave
 		setWaveType(SIN);			//set wave type to SINE by default
+        //pressNote(88, 127);
+       // pressNote(90, 127);
 	}
 	
 	void setSampleRate(unsigned int rate){
@@ -33,18 +35,17 @@ class WaveGen{
 	}
 	
 	void setWaveRes(unsigned int res){	//set wave resoloution up to 1024 (size of sine table array limits this)
-		this->mWaveRes = (res <= 1024)? res : 1024;	//bound res to upper limit of 1023
+		this->mWaveRes = (res <= 1024)? res : 1024;	//bound res to upper limit of 1024
 		float angle;
-		for (int x = 0; x < mWaveRes; x++){		//
-			angle = ((float)x/mWaveRes)*(2*PI);				//calculate angle increment
-			mSineTable[x] = (std::sinf(angle)+1.0f)/2;		//generate wavetable
+		for (int x = 0; x < mWaveRes; x++){		//loop from 0 to waveRes -1 (0 - 1023 )
+			angle = (((float)x*2*PI)/mWaveRes);				//calculate angle increment
+			mSineTable[x] = 0.5f*(std::sinf(angle));		//generate wavetable
 		}
 	}
 	
 	unsigned int getWaveRes(){
 		return this->mWaveRes;
 	}
-
 
 	void setWaveType(WAVE_TYPE type){			//select wave type
 		this->mWaveType = type;
@@ -67,7 +68,7 @@ class WaveGen{
 
     void releaseNote(int MIDInum){
         toneParams note;
-        for (int i; i < playList.size(); i++){
+        for (int i = 0; i < playList.size(); i++){
             note = playList.at(i);
             if (note.MIDInum == MIDInum){
                 playList.erase(playList.begin()+i); //if note has been released by the player, remove it from 
@@ -80,55 +81,59 @@ class WaveGen{
         switch(cmd.type){
             case NOTE_ON:
                 pressNote(cmd.param1, cmd.param2); //tell synth which note to play, and how looud
+                PrintQueue.call(printf, "NOTE_ON:  %d Vel: %d\r\n", cmd.param1, cmd.param2);
                 break;
             case NOTE_OFF:
                 releaseNote(cmd.param1); //tell synth what not to stop playing
+                PrintQueue.call(printf, "NOTE_OFF: %d \r\n", cmd.param1);
                 break;
 
             case CONTROL_CHANGE:
+                PrintQueue.call(printf, "CONTROL_CHANGE: %d \t%d\r\n", cmd.param1, cmd.param2);
                 break;
 
             case PITCHWHEEL:
                 mPitchwheel = cmd.param1;
+                PrintQueue.call(printf, "PITCH_WHEEL: %d \t%d\r\n", cmd.param1);
                 break;
-
-
         }
-
     }
 	
 	float produceSample(){
         toneParams note; 
 		volatile float sample = 0.0f;	//if note is NOT active, output will remain 0.0
+        unsigned int note_count = playList.size();
 
-        for(int i = 0; i < playList.size(); i++){
+        for(int i = 0; i < note_count; i++){
             note = playList.at(i);  //read the next note on the play list
-            if(note.active){	//if note is on, calculate the next output
-                note.Wo += note.angularStep;	//increment angle
-                note.Wo = (note.Wo > ((float)(mWaveRes - 1)))?(note.Wo - ((float)(mWaveRes - 1))):(note.Wo); //bound angle to limits
-                switch(mWaveType){
-                    case SIN:
-                        sample += (mSineTable[(int)note.Wo])*note.velocity;	//round angle to nearest intager within wave resoloution and multiply by velocity
-                        break;
-                    case TRI:
-                        sample += ((note.Wo >= (float)mWaveRes/2)?(2*(note.Wo/(mWaveRes-1))):(-2*(note.Wo/(mWaveRes-1))))*note.velocity;   //convert sine to triangle wave
-                        break;
-                    
-                    case SAW:
-                        sample += (note.Wo/(mWaveRes-1))*note.velocity;                                                             //convert sine to saw
-                        break;
-                    
-                    case SQU:
-                        sample += ((note.Wo >= (float)mWaveRes/2)?1:0)*note.velocity;                                                      //convert sine to square
-                        break;
-                }
-                playList.erase(playList.begin() + i );         //remove old note from playlist
-                playList.insert(playList.begin() + i,note);    //insert modified note back into playlist
-                //printf("Note: %d\tWo: %5.4f\tout: %5.4f \r\n", note.MIDInum, note.Wo,out);
+
+            note.Wo += note.angularStep;	//increment angle
+            note.Wo = (note.Wo > ((float)(mWaveRes - 1)))?(note.Wo - ((float)(mWaveRes - 1))):(note.Wo); //bound angle to limits
+            switch(mWaveType){
+                case SIN:
+                    sample += (mSineTable[(int)note.Wo])*note.velocity;	//round angle to nearest intager within wave resoloution and multiply by velocity
+                    break;
+                case TRI:
+                    sample += ((note.Wo >= (float)mWaveRes/2)?(2*(note.Wo/(mWaveRes-1))):(-2*(note.Wo/(mWaveRes-1))))*note.velocity;   //convert sine to triangle wave
+                    break;
+                
+                case SAW:
+                    sample += (note.Wo/(mWaveRes-1))*note.velocity;                                                             //convert sine to saw
+                    break;
+                
+                case SQU:
+                    sample += ((note.Wo >= (float)mWaveRes/2)?1:0)*note.velocity;                                                      //convert sine to square
+                    break;
             }
+            playList.erase(playList.begin() + i );         //remove old note from playlist
+            playList.insert(playList.begin() + i,note);    //insert modified note back into playlist
+            //printf("Note: %d\tWo: %5.4f\tout: %5.4f \r\n", note.MIDInum, note.Wo,out);
+        }
+        if (note_count>1){
+            sample = sample/note_count; //scale RMS
         }
         //Master Clipping
-        sample = (sample/playList.size());
+        sample += 0.5f; //Level shift sample - 0 to 1
         sample = (sample > 1.0f)?1.0f:sample;
         sample = (sample < 0.0f)?0.0f:sample;
 		return sample;   //return output after scaling
@@ -138,7 +143,7 @@ class WaveGen{
         typedef struct{
             bool    active;         //if note is not active, skip any calculations
             float  angularStep;    //calculated angular step per sample
-            float  Wo;             //angular velocity
+            float  Wo;             //angle
             char    MIDInum;        //MIDI code for note
             float  period_us;      //wavelength
             float  velocity;       //loudness of note (gain)

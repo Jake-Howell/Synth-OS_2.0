@@ -2,83 +2,61 @@
 
 
 MIDI::MIDI():cmdBuffer(128){
-	//m_input.print("Keyboard:\r\n");
-	for(int i = 0; i<POLY_COUNT; i++){
-		mNotes[i].num = SILENT_NOTE;
-		mNotes[i].velocity = 0;
-	}
 }
 
-void MIDI::controler(){
-//    while(!serialBuffer.isEmpty()){ //if serial buffer has data in it, convert and control synth
-//    }
-
-}
-
-char MIDI::get_note_num(unsigned int index){
-	return mNotes[index].num;
-}
-char MIDI::get_note_vel(unsigned int index){
-	return mNotes[index].velocity;
-}
-
-void MIDI::serialToMIDIconverter(char d){
-	m_data[m_byte_count++] = d;		//add data to array and increment index
-	
-	if (m_byte_count >= 4){				//if 4 bytes have been recieved (type, param1, param2, cksum)
-		if(((m_data[0]+m_data[1]+m_data[2])&0xFF) == (m_data[3]&0xFF)){	//if check sum matches
-			m_currentCMD.type = m_data[0];		//format data
-			m_currentCMD.param1 = m_data[1];
-			m_currentCMD.param2 = m_data[2];
-			cmdBuffer.put(m_currentCMD);				//add formatted data to buffer
-		}
-		
-		m_currentCMD = {0};	//reset data
-		m_byte_count = 0;		//reset byte count
-	}
-	
+void MIDI::serialToMIDIconverter(MIDI_Serial_Bloak_t d){
+    MIDI_cmd_t currentCMD;
+    if(d.cs == (d.d0 + d.d1 + d.d2)){	//if check sum matches
+        currentCMD.type   = d.d0;		//format data
+        currentCMD.param1 = d.d1;
+        currentCMD.param2 = d.d2;
+        cmdBuffer.put(currentCMD);				//add formatted data to buffer
+    }else{
+        PrintQueue.call(printf, "Corrupted MIDI CMD\r\n");
+    }
 }
 
 MIDI_cmd_t MIDI::pc_keyMap(char d){
-	MIDI_cmd_t cmd;
+	unsigned int note_offset = 80;
+    MIDI_cmd_t cmd;
 	cmd.type = NOTE_ON;
-	cmd.param2 = 127;	//by default, set velocity to max
+	cmd.param2 = 127;	//by default, set velocity to ma
 	switch(d){
 		case 'z':
-			cmd.param1 = 48;
+			cmd.param1 = note_offset + 1;
 			break;
 		case 's':
-			cmd.param1 = 49;
+			cmd.param1 = note_offset + 2;
 			break;
 		case 'x':
-			cmd.param1 = 50;
+			cmd.param1 = note_offset + 3;
 			break;
 		case 'd':
-			cmd.param1 = 51;
+			cmd.param1 = note_offset + 4;
 			break;
 		case 'c':
-			cmd.param1 = 52;
+			cmd.param1 = note_offset + 5;
 			break;
 		case 'v':
-			cmd.param1 = 53;
+			cmd.param1 = note_offset + 6;
 			break;
 		case 'g':
-			cmd.param1 = 54;
+			cmd.param1 = note_offset + 7;
 			break;
 		case 'b':
-			cmd.param1 = 55;
+			cmd.param1 = note_offset + 8;
 			break;
 		case 'h':
-			cmd.param1 = 56;
+			cmd.param1 = note_offset + 9;
 			break;
 		case 'n':
-			cmd.param1 = 57;
+			cmd.param1 = note_offset + 10;
 			break;
 		case 'j':
-			cmd.param1 = 58;
+			cmd.param1 = note_offset + 11;
 			break;
 		case 'm':
-			cmd.param1 = 59;
+			cmd.param1 = note_offset + 12;
 			break;
 		case ' ':
 			cmd.type = NOTE_OFF;

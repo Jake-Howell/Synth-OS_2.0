@@ -5,13 +5,14 @@
 #define I2S_MODULE SPI2
 
 #define GLOBAL_FLAG_PORT GPIOD
-#define GLOBAL_FLAG_PIN    6
+#define GLOBAL_FLAG_PIN    3
 
 //Event Flags
-#define BUFFER_BELOW_THRESHOLD 1
-#define SAMPLE_FLAG            2
+#define BUFFER_BELOW_THRESHOLD  1
+#define SAMPLE_FLAG             2
+#define MIDI_DATA_READY         4
 
-#define SAMPLE_RATE 44100
+#define SAMPLE_RATE 50000
 #define BUFFER_SIZE 4096
 
 
@@ -24,6 +25,13 @@ typedef struct{
 	char param1;
 	char param2;
 } MIDI_cmd_t;
+
+typedef struct{
+    uint8_t d0;
+    uint8_t d1;
+    uint8_t d2;
+    uint8_t cs; //checksum
+}MIDI_Serial_Bloak_t;
 
 typedef struct{
 	char num;
