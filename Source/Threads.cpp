@@ -10,9 +10,9 @@ void start_threads(){
     //start print queue
     PrintThread.start(printer);
     //start updating IO 
-    IOCheckThread.start(updateIO);
+    //IOCheckThread.start(updateIO);
     //start converting MIDI data to control device
-    MIDI_Thread.start(MIDI_Converter);
+    //MIDI_Thread.start(MIDI_Converter);
     //start producing samples (High Priority thread)
     SampleProducerThread.start(sampleGen);              //start sample producer thread
 }

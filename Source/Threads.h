@@ -4,7 +4,7 @@
 #include "rtos/ThisThread.h"
 #include "HW_Timer.h"
 #include "cbuff.hpp"
-#include "waveGen.cpp"
+#include "waveGen.h"
 #include "MIDI_Decoder.hpp"
 #include "RotaryEncoder.h"
 

@@ -6,7 +6,7 @@
 #include "rtos/ThisThread.h"
 #include "HW_Timer.h"
 #include "cbuff.hpp"
-#include "waveGen.cpp"
+#include "waveGen.h"
 #include "MIDI_Decoder.hpp"
 #include "RotaryEncoder.h"
 #include <cstdint>
@@ -27,7 +27,10 @@ MIDI Midi;
 
 RotaryEncoder RE_D(RE_D_Pins);
 
-Thread PrintThread, SampleProducerThread(osPriorityHigh), MIDI_Thread, IOCheckThread;
+Thread SampleProducerThread(osPriorityHigh, OS_STACK_SIZE, nullptr, "Sample Producer");
+Thread PrintThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "Print Thread");
+Thread MIDI_Thread(osPriorityNormal, OS_STACK_SIZE, nullptr, "MIDI Thread");
+Thread IOCheckThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "IO Check Thread");
 osThreadId_t PrintThreadID, mainThreadID, SampleProducerThreadID, outputStreamThreadID, MIDI_ThreadID;
 
 EventQueue PrintQueue;

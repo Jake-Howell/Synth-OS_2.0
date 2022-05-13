@@ -15,11 +15,23 @@
 #define SAMPLE_RATE 50000
 #define BUFFER_SIZE 4096
 
+#define KEY_COUNT 10
+
 
 inline void INIT_GLOBAL_FLAG() {GLOBAL_FLAG_PORT->MODER &= ~(3u<<(GLOBAL_FLAG_PIN*2));GLOBAL_FLAG_PORT->MODER |=  (1u<<(GLOBAL_FLAG_PIN*2));GLOBAL_FLAG_PORT->PUPDR |= PullDown;}
 inline void PULSE_GLOBAL_FLAG()     {GLOBAL_FLAG_PORT->BSRR |= (1u<<GLOBAL_FLAG_PIN); GLOBAL_FLAG_PORT->BSRR |= (1u<<(GLOBAL_FLAG_PIN + 16));}
 inline void TOGGLE_GLOBAL_FLAG()    {GLOBAL_FLAG_PORT->ODR ^= (1u<<GLOBAL_FLAG_PIN);}
 
+typedef enum {SIN = 0, TRI, SAW, SQU}WAVE_TYPE;	
+typedef struct{
+    bool    active;         //if note is not active, skip any calculations
+    float  angularStep;    //calculated angular step per sample
+    float  Wo;             //angle
+    char    MIDInum;        //MIDI code for note
+    float  period_us;      //wavelength
+    float  velocity;       //loudness of note (gain)
+    
+}toneParams;
 typedef struct{
 	char type;
 	char param1;
