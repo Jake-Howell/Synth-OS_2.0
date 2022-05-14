@@ -35,10 +35,10 @@
     {
         "module": "Source\\Key.o",
         "size": {
-            ".text": 1166,
+            ".text": 1170,
             ".data": 0,
             ".bss": 0,
-            ".text-delta": 0,
+            ".text-delta": 4,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -70,19 +70,19 @@
         "size": {
             ".text": 1432,
             ".data": 0,
-            ".bss": 5872,
+            ".bss": 5864,
             ".text-delta": 0,
             ".data-delta": 0,
-            ".bss-delta": 0
+            ".bss-delta": -8
         }
     },
     {
         "module": "Source\\waveGen.o",
         "size": {
-            ".text": 568,
+            ".text": 558,
             ".data": 0,
             ".bss": 0,
-            ".text-delta": 0,
+            ".text-delta": -10,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -243,10 +243,10 @@
     },
     {
         "summary": {
-            "static_ram": 33216,
-            "static_ram_delta": 0,
-            "total_flash": 66430,
-            "total_flash_delta": 0
+            "static_ram": 33208,
+            "static_ram_delta": -8,
+            "total_flash": 66424,
+            "total_flash_delta": -6
         }
     }
 ]

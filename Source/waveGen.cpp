@@ -40,7 +40,14 @@ void WaveGen::setWaveRes(unsigned int res){	//set wave resoloution up to 1024 (s
 unsigned int WaveGen::getWaveRes(){
     return this->mWaveRes;
 }
-
+float WaveGen::getFrequencyScalar(){
+    return this->frqScalar;
+}
+void WaveGen::setFrequencyScalar(float s){
+    s = (s>2.0f)?   2.0f    :   s;  //clamp scaling to max 2.0X frequency
+    s = (s<0.5) ?   0.5f    :   s;  //clamp scaling to min 0.5X frequency
+    this->frqScalar = s;
+}
 void WaveGen::setWaveType(WAVE_TYPE type){			//select wave type
     this->mWaveType = type;
 }
@@ -99,34 +106,7 @@ float WaveGen::sin_lut(unsigned int angle){
 float WaveGen::produceSample(){
     //toneParams note; 
     volatile float sample = 0.0f;	//if note is NOT active, output will remain 0.0
-    /*
-    unsigned int note_count = playList.size();
 
-    for(int i = 0; i < note_count; i++){
-        note = playList.at(i);  //read the next note on the play list
-
-        note.Wo += note.angularStep;	//increment angle
-        note.Wo = (note.Wo > ((float)(mWaveRes - 1)))?(note.Wo - ((float)(mWaveRes - 1))):(note.Wo); //bound angle to limits
-        switch(mWaveType){
-            case SIN:
-                sample += (mSineTable[(int)note.Wo])*note.velocity;	//round angle to nearest intager within wave resoloution and multiply by velocity
-                break;
-            case TRI:
-                sample += ((note.Wo >= (float)mWaveRes/2)?(2*(note.Wo/(mWaveRes-1))):(-2*(note.Wo/(mWaveRes-1))))*note.velocity;   //convert sine to triangle wave
-                break;
-            
-            case SAW:
-                sample += (note.Wo/(mWaveRes-1))*note.velocity;                                                             //convert sine to saw
-                break;
-            
-            case SQU:
-                sample += ((note.Wo >= (float)mWaveRes/2)?1:0)*note.velocity;                                                      //convert sine to square
-                break;
-        }
-        playList.erase(playList.begin() + i );         //remove old note from playlist
-        playList.insert(playList.begin() + i,note);    //insert modified note back into playlist
-        //printf("Note: %d\tWo: %5.4f\tout: %5.4f \r\n", note.MIDInum, note.Wo,out);
-    }*/
     for (int i = 0; i<KEY_COUNT; i++){
         sample += keys[i]->getSample();      //get sample from each key
     }

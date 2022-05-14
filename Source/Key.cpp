@@ -76,6 +76,7 @@ float Key::runEnv(){
 float Key::getSample(){
     float sample = 0.0;
     float envGain = 1.0f;
+    float FrqScalar = Synth->getFrequencyScalar();
     if (active){                        //if key not active, sample = 0
         angle += angularStep;
         angle = (angle > ((float)(waveRes - 1)))?(angle - ((float)(waveRes - 1))):(angle); //bound angle to limits

@@ -26,17 +26,20 @@ class WaveGen{
         float produceSample();
         WAVE_TYPE getWaveType();
         float sin_lut(unsigned int angle);
+        float getFrequencyScalar();
+        void setFrequencyScalar(float);
 
     private:
-        vector<toneParams> playList;        //create a list of waveforms to add to sample
         Key *keys[KEY_COUNT];
-        WAVE_TYPE mWaveType;                //Type of wave to be generated (SIN, SAW, TRI, SQU)
+        FX *audioFX[]   //TODO add list of audio FX to run and call vibrato
+        WAVE_TYPE mWaveType;            //Type of wave to be generated (SIN, SAW, TRI, SQU)
         char mPitchwheel;
         //Synth Params
-        unsigned int mSampleRate = 96000;   //96KHz sample rate
-        float mSamplePeriod_us;            //10.41667 us @ 96KHz
-        unsigned int active_keys;           //store the number of active keys
-		unsigned int mWaveRes = 1024;       //resoloution of wave table
+        float frqScalar;
+        unsigned int mSampleRate;       //48KHz sample rate
+        float mSamplePeriod_us;         //10.41667 us @ 96KHz
+        unsigned int active_keys;       //store the number of active keys
+		unsigned int mWaveRes = 1024;   //resoloution of wave table
 		float mSineTable[1024];		    //sinetable from 0 to 90 degrees
 
 };
