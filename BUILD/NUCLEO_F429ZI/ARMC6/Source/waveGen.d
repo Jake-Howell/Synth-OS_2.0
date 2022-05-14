@@ -1,6 +1,7 @@
 BUILD\NUCLEO_F429ZI\ARMC6\Source\waveGen.o: Source\waveGen.cpp \
-  BUILD\NUCLEO_F429ZI\ARMC6\mbed_config.h Source\global_defs.hpp \
-  mbed-os\mbed.h mbed-os\platform\include\platform\mbed_version.h \
+  BUILD\NUCLEO_F429ZI\ARMC6\mbed_config.h Source\waveGen.h \
+  Source\note_periods.cpp Source\global_defs.hpp mbed-os\mbed.h \
+  mbed-os\platform\include\platform\mbed_version.h \
   mbed-os\rtos\include\rtos\rtos.h \
   mbed-os\rtos\include\rtos\internal\mbed_rtos_storage.h \
   mbed-os\cmsis\device\rtos\include\mbed_rtx_storage.h \
@@ -312,4 +313,6 @@ BUILD\NUCLEO_F429ZI\ARMC6\Source\waveGen.o: Source\waveGen.cpp \
   mbed-os\platform\include\platform\ScopedRamExecutionLock.h \
   mbed-os\platform\include\platform\mbed_stats.h \
   mbed-os\platform\include\platform\Stream.h \
-  mbed-os\platform\include\platform\FileLike.h Source\cbuff.hpp
+  mbed-os\platform\include\platform\FileLike.h Source\Key.h \
+  Source\envelope.h Source\AudioFX\LinearASDR.h \
+  Source\AudioFX\..\envelope.h Source\AudioFX\..\global_defs.hpp

@@ -2,7 +2,7 @@
 #define _WAVE_GEN_H_
 
 #define PI 3.141592654
-#define OFF 127
+
 #include "note_periods.cpp"
 #include <cmath>
 #include "stdlib.h"

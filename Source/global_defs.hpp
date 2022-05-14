@@ -1,6 +1,7 @@
 #ifndef _GLOBAL_H_
 #define _GLOBAL_H_
 #include "mbed.h"
+#include <cstdint>
 
 #define I2S_MODULE SPI2
 
@@ -21,8 +22,15 @@
 inline void INIT_GLOBAL_FLAG() {GLOBAL_FLAG_PORT->MODER &= ~(3u<<(GLOBAL_FLAG_PIN*2));GLOBAL_FLAG_PORT->MODER |=  (1u<<(GLOBAL_FLAG_PIN*2));GLOBAL_FLAG_PORT->PUPDR |= PullDown;}
 inline void PULSE_GLOBAL_FLAG()     {GLOBAL_FLAG_PORT->BSRR |= (1u<<GLOBAL_FLAG_PIN); GLOBAL_FLAG_PORT->BSRR |= (1u<<(GLOBAL_FLAG_PIN + 16));}
 inline void TOGGLE_GLOBAL_FLAG()    {GLOBAL_FLAG_PORT->ODR ^= (1u<<GLOBAL_FLAG_PIN);}
-
+typedef enum {ATTACK = 0, DECAY, SUSTAIN, RELEASE, OFF}ASDR_STATE_t;
 typedef enum {SIN = 0, TRI, SAW, SQU}WAVE_TYPE;	
+typedef struct {
+    uint32_t attack_steps;
+    uint32_t decay_steps;
+    uint32_t release_steps;
+    float attack_gain;
+    float sustain_gain;
+}EnvParams_t;
 typedef struct{
     bool    active;         //if note is not active, skip any calculations
     float  angularStep;    //calculated angular step per sample

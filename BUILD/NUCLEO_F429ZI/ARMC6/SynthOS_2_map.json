@@ -1,5 +1,16 @@
 [
     {
+        "module": "Source\\AudioFX",
+        "size": {
+            ".text": 236,
+            ".data": 0,
+            ".bss": 0,
+            ".text-delta": 0,
+            ".data-delta": 0,
+            ".bss-delta": 0
+        }
+    },
+    {
         "module": "Source\\BM_DAC.o",
         "size": {
             ".text": 352,
@@ -22,9 +33,20 @@
         }
     },
     {
+        "module": "Source\\Key.o",
+        "size": {
+            ".text": 1166,
+            ".data": 0,
+            ".bss": 0,
+            ".text-delta": 0,
+            ".data-delta": 0,
+            ".bss-delta": 0
+        }
+    },
+    {
         "module": "Source\\MIDI_Decoder.o",
         "size": {
-            ".text": 596,
+            ".text": 354,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -35,7 +57,7 @@
     {
         "module": "Source\\Threads.o",
         "size": {
-            ".text": 4691,
+            ".text": 540,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -46,10 +68,21 @@
     {
         "module": "Source\\main.o",
         "size": {
-            ".text": 2132,
+            ".text": 1432,
             ".data": 0,
-            ".bss": 6332,
-            ".text-delta": -10,
+            ".bss": 5872,
+            ".text-delta": 0,
+            ".data-delta": 0,
+            ".bss-delta": 0
+        }
+    },
+    {
+        "module": "Source\\waveGen.o",
+        "size": {
+            ".text": 568,
+            ".data": 0,
+            ".bss": 0,
+            ".text-delta": 0,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -57,7 +90,7 @@
     {
         "module": "[lib]\\c_w.l",
         "size": {
-            ".text": 11313,
+            ".text": 11191,
             ".data": 16,
             ".bss": 348,
             ".text-delta": 0,
@@ -79,7 +112,7 @@
     {
         "module": "[lib]\\libcpp_w.l",
         "size": {
-            ".text": 9,
+            ".text": 1,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -145,7 +178,7 @@
     {
         "module": "mbed-os\\drivers",
         "size": {
-            ".text": 3970,
+            ".text": 3890,
             ".data": 0,
             ".bss": 1780,
             ".text-delta": 0,
@@ -189,7 +222,7 @@
     {
         "module": "mbed-os\\rtos",
         "size": {
-            ".text": 1995,
+            ".text": 1957,
             ".data": 0,
             ".bss": 8,
             ".text-delta": 0,
@@ -210,10 +243,10 @@
     },
     {
         "summary": {
-            "static_ram": 33676,
+            "static_ram": 33216,
             "static_ram_delta": 0,
-            "total_flash": 69801,
-            "total_flash_delta": -10
+            "total_flash": 66430,
+            "total_flash_delta": 0
         }
     }
 ]

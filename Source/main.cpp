@@ -31,7 +31,7 @@ Thread SampleProducerThread(osPriorityHigh, OS_STACK_SIZE, nullptr, "Sample Prod
 Thread PrintThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "Print Thread");
 Thread MIDI_Thread(osPriorityNormal, OS_STACK_SIZE, nullptr, "MIDI Thread");
 Thread IOCheckThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "IO Check Thread");
-osThreadId_t PrintThreadID, mainThreadID, SampleProducerThreadID, outputStreamThreadID, MIDI_ThreadID;
+
 
 EventQueue PrintQueue;
 Ticker sampleTimer;
@@ -44,8 +44,6 @@ void HW_TIMER_Callback();
 int main()
 {
     INIT_GLOBAL_FLAG();
-
-    mainThreadID = ThisThread::get_id();
     SystemCoreClockUpdate();
     printf("\r\nSystem Core Clck:\t%d MHz\r\n", (SystemCoreClock/1000000));
 

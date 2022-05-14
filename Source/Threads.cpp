@@ -19,7 +19,6 @@ void start_threads(){
 
 //sample producer thread callback
 void sampleGen(){    //FIFO Producer Thread
-    SampleProducerThreadID = ThisThread::get_id();
     PrintQueue.call(printf, "Starting sampleGen\r\n");
     
     //SampleProducerThread.flags_set(1);  //on boot, fill buffer
@@ -41,7 +40,6 @@ void sampleGen(){    //FIFO Producer Thread
 
 //convert serial data into midi commands
 void MIDI_Converter(){
-    MIDI_ThreadID = ThisThread::get_id();
 
     MIDI_cmd_t cmd;
     MIDI_Serial_Bloak_t chunk;  //store 4 bytes of midi data to convert to a command
@@ -65,7 +63,6 @@ void MIDI_Converter(){
 }
 
 void printer(){
-    PrintThreadID = ThisThread::get_id();
     PrintQueue.call(printf, "Starting printer\r\n");
     PrintQueue.dispatch_forever();
 }

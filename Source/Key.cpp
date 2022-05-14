@@ -1,11 +1,19 @@
 #include "Key.h"
 #include "waveGen.h"
 
-//extern EventQueue PrintQueue;
+
 
 Key::Key(WaveGen* synth){
     Synth = synth;
     setKeyParams(127,0);    //set key params for OFF note
+    asdr_state = ATTACK;    //start envelope in attack state
+    //set Envelope params for key
+    this->envSetup.attack_steps     = 1.0*SAMPLE_RATE;  //calculate number of steps for 0.5 secons
+    this->envSetup.decay_steps      = 1.0*SAMPLE_RATE;  //calculate number of steps for 1 second decay
+    this->envSetup.release_steps    = 3.0*SAMPLE_RATE;  //calculate number of steps for 3 second release
+    this->envSetup.attack_gain      = 1.0f;
+    this->envSetup.sustain_gain     = 0.6f;
+    envelope = new LinearASDR(this, envSetup);
 }
 void Key::setKeyParams(unsigned int noteNum, unsigned int vel){
     float step = 0.0;
@@ -22,8 +30,47 @@ void Key::setKeyParams(unsigned int noteNum, unsigned int vel){
 bool Key::isActive(){
     return this->active;
 }
+float Key::runEnv(){
+    float envGain = 1.0f;
+    if(active){
+        time_steps += 1;
+        switch(asdr_state){
+            case ATTACK:
+                envGain = envelope->Attack(time_steps);
+                if(time_steps >= envSetup.attack_steps){ //if phase has ended, 
+                    asdr_state =  DECAY;        //change state
+                    time_steps = 0;             //reset step couter
+                } 
+                break;
+            case DECAY:
+                envGain = envelope->Decay(time_steps);
+                if(time_steps >= envSetup.decay_steps){ //if phase has ended, 
+                    asdr_state =  SUSTAIN;        //change state
+                    time_steps = 0;             //reset step couter
+                } 
+                break;
+            case SUSTAIN:
+                envGain = envelope->Sustain();  //stay in sustain state until synth changes it
+                break;
+            case RELEASE:
+                envGain = envelope->Release(time_steps);
+                if(time_steps >= envSetup.release_steps){ //if phase has ended, 
+                    asdr_state =  OFF;        //change state
+                    time_steps = 0;             //reset step couter
+                } 
+                break;
+            case OFF:
+                active = false;         //turn key off
+                time_steps = 0;
+                asdr_state = ATTACK;    //change state to attack, ready for next key press
+                break;
+        }
+    }
+    return envGain;
+}
 float Key::getSample(){
     float sample = 0.0;
+    float envGain = 1.0f;
     if (active){                        //if key not active, sample = 0
         angle += angularStep;
         angle = (angle > ((float)(waveRes - 1)))?(angle - ((float)(waveRes - 1))):(angle); //bound angle to limits
@@ -43,7 +90,8 @@ float Key::getSample(){
                 sample = getSqu();      //convert sine to square
                 break;
         }
-        sample = sample*velocity;
+        envGain = runEnv();
+        sample = sample*velocity*envGain;
     }
     //printf("key Sample: %d\tangle: %d\r\n",(int)(100*sample), (unsigned int)angle);
     return sample;
