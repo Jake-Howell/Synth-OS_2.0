@@ -4,12 +4,15 @@
 #include "envelope.h"
 #include "AudioFX/LinearASDR.h"
 #include "global_defs.hpp"
+#include <cstdint>
 class WaveGen;
 class Key{
     public:
         Key(WaveGen* Synth);
         float getSample();
+        uint8_t getMIDInum();
         void setKeyParams(unsigned int noteNum, unsigned int velocity);
+        void releaseKey();
         bool isActive();
     private:
         float runEnv();
@@ -27,7 +30,7 @@ class Key{
         volatile float  velocity;       //loudness of note (gain)
 
         Envelope* envelope;
-        ASDR_STATE_t asdr_state;
+        ASDR_STATE_t adsr_state;
         uint32_t time_steps;    //keep track of time steps for envelope
         EnvParams_t envSetup;
 

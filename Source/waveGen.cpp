@@ -46,18 +46,7 @@ void WaveGen::setWaveType(WAVE_TYPE type){			//select wave type
 }
 
 void WaveGen::pressNote(char noteNum, char velocity){	//add note to wave gen, and turn on wave gen
-    /*
-    toneParams note;
-    float step = 0.0;
-    note.MIDInum = noteNum;
-    note.period_us = note_periods_us[noteNum];					//select note period using MIDI note index
-    note.Wo = 0.0f;
-    step = mSamplePeriod_us/note.period_us;						//Calculate how much each time step (samplePeriod) changes the angle
-    note.velocity = ((float)velocity/127);							//calculate velocity multiplier
-    note.angularStep = step*(mWaveRes - 1);												//denormalise angular step to produce an index for sineTable
-    note.active = true;																//turn the wave generator on
-    playList.push_back(note);*/
-    
+
     for (int i = 0; i < KEY_COUNT; i++){
         if (!(keys[i]->isActive())){    //if key is not active, use key to play note
             keys[i]->setKeyParams(noteNum, velocity);
@@ -70,13 +59,11 @@ void WaveGen::pressNote(char noteNum, char velocity){	//add note to wave gen, an
 }
 
 void WaveGen::releaseNote(int MIDInum){
-    toneParams note;
-    for (int i = 0; i < playList.size(); i++){
-        note = playList.at(i);
-        if (note.MIDInum == MIDInum){
-            playList.erase(playList.begin()+i); //if note has been released by the player, remove it from 
-            active_keys--;                      //decrement active keys
-            break; //break from loop if note has been erased
+    for (int i = 0; i < KEY_COUNT; i++){
+        if (!(keys[i]->isActive()) && (keys[i]->getMIDInum() == MIDInum)){    //if key is not active, use key to play note
+            keys[i]->releaseKey();
+            active_keys--;
+            return;
         }
     }
 }

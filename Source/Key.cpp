@@ -6,7 +6,7 @@
 Key::Key(WaveGen* synth){
     Synth = synth;
     setKeyParams(127,0);    //set key params for OFF note
-    asdr_state = ATTACK;    //start envelope in attack state
+    adsr_state = ATTACK;    //start envelope in attack state
     //set Envelope params for key
     this->envSetup.attack_steps     = 1.0*SAMPLE_RATE;  //calculate number of steps for 0.5 secons
     this->envSetup.decay_steps      = 1.0*SAMPLE_RATE;  //calculate number of steps for 1 second decay
@@ -25,7 +25,12 @@ void Key::setKeyParams(unsigned int noteNum, unsigned int vel){
     velocity = ((float)vel/127);						//calculate velocity multiplier
     angularStep = step*((Synth->getWaveRes()) - 1);			//denormalise angular step to produce an index for sineTable
     active = (noteNum == 127)?false:true;                   //if note = 127, key is off																//turn the wave generator on
-
+}
+void Key::releaseKey(){
+    adsr_state = RELEASE;
+}
+uint8_t Key::getMIDInum(){
+    return this->MIDInum;
 }
 bool Key::isActive(){
     return this->active;
@@ -34,18 +39,18 @@ float Key::runEnv(){
     float envGain = 1.0f;
     if(active){
         time_steps += 1;
-        switch(asdr_state){
+        switch(adsr_state){
             case ATTACK:
                 envGain = envelope->Attack(time_steps);
                 if(time_steps >= envSetup.attack_steps){ //if phase has ended, 
-                    asdr_state =  DECAY;        //change state
+                    adsr_state =  DECAY;        //change state
                     time_steps = 0;             //reset step couter
                 } 
                 break;
             case DECAY:
                 envGain = envelope->Decay(time_steps);
                 if(time_steps >= envSetup.decay_steps){ //if phase has ended, 
-                    asdr_state =  SUSTAIN;        //change state
+                    adsr_state =  SUSTAIN;        //change state
                     time_steps = 0;             //reset step couter
                 } 
                 break;
@@ -55,14 +60,14 @@ float Key::runEnv(){
             case RELEASE:
                 envGain = envelope->Release(time_steps);
                 if(time_steps >= envSetup.release_steps){ //if phase has ended, 
-                    asdr_state =  OFF;        //change state
+                    adsr_state =  OFF;        //change state
                     time_steps = 0;             //reset step couter
                 } 
                 break;
             case OFF:
                 active = false;         //turn key off
                 time_steps = 0;
-                asdr_state = ATTACK;    //change state to attack, ready for next key press
+                adsr_state = ATTACK;    //change state to attack, ready for next key press
                 break;
         }
     }
