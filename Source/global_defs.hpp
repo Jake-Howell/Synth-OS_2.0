@@ -19,6 +19,17 @@
 #define KEY_COUNT 10
 #define MAX_FX 5
 
+#define LFO_MAX_GAIN    1.0f
+#define LFO_MAX_FREQ    20.0f//max freq 20Hz
+
+#define LFO_MIN_GAIN    0.0f //
+#define LFO_MIN_FREQ    0.1f //min frequency 0.1Hz
+
+#define MAX_GAIN_SCALAR 1.0f
+#define MAX_FRQ_SCALAR  2.0f
+
+#define MIN_GAIN_SCALAR 0.0f
+#define MIN_FRQ_SCALAR  0.5f
 
 inline void INIT_GLOBAL_FLAG() {GLOBAL_FLAG_PORT->MODER &= ~(3u<<(GLOBAL_FLAG_PIN*2));GLOBAL_FLAG_PORT->MODER |=  (1u<<(GLOBAL_FLAG_PIN*2));GLOBAL_FLAG_PORT->PUPDR |= PullDown;}
 inline void PULSE_GLOBAL_FLAG()     {GLOBAL_FLAG_PORT->BSRR |= (1u<<GLOBAL_FLAG_PIN); GLOBAL_FLAG_PORT->BSRR |= (1u<<(GLOBAL_FLAG_PIN + 16));}

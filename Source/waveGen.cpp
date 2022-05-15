@@ -9,11 +9,13 @@ WaveGen::WaveGen(unsigned int sampleRate){
         keys[i] = new Key(this);
     }
     fx_count = 0;
+    frqScalar = 1.0f;
+    gainScalar = 1.0f;
     setSampleRate(sampleRate);	//set sample rate and calculate sample period
     setWaveRes(1024);			//calculate 1024 points in sine wave
     setWaveType(SIN);			//set wave type to SINE by default
     pressNote(88, 127);
-    pressNote(92, 127);
+    pressNote(90, 127);
 }
 
 void WaveGen::setSampleRate(unsigned int rate){
@@ -110,6 +112,7 @@ float WaveGen::produceSample(){
         sample = sample/active_keys; //scale RMS
     }
     //Master Clipping
+    sample = sample*gainScalar;
     sample += 0.5f; //Level shift sample - 0 to 1
     sample = (sample > 1.0f)?1.0f:sample;
     sample = (sample < 0.0f)?0.0f:sample;
@@ -125,16 +128,16 @@ void WaveGen::addFX(FX* fx){
     }
 }
 void WaveGen::setFrequencyScalar(float scalar){
-    scalar = (scalar>2.0f)?2.0f:scalar; //set upper limit to 2X frequency
-    scalar = (scalar<0.5f)?0.5f:scalar; //set lower limit to 0.5X frequency
+    scalar = (scalar>MAX_FRQ_SCALAR)? MAX_FRQ_SCALAR :scalar; //set upper limit to 2X frequency
+    scalar = (scalar<MIN_FRQ_SCALAR)? MIN_FRQ_SCALAR :scalar; //set lower limit to 0.5X frequency
     this->frqScalar = scalar;
 }
 float WaveGen::getFrequencyScalar(){
     return this->frqScalar;
 }
 void WaveGen::setGainScalar(float scalar){
-    scalar = (scalar>1.0f)?1.0f:scalar; //set upper gain limit of 1
-    scalar = (scalar < 0.0f)?0.0f:scalar; //set lower limit of 0      
+    scalar = (scalar > MAX_GAIN_SCALAR)? MAX_GAIN_SCALAR :scalar; //set upper gain limit of 1
+    scalar = (scalar < MIN_GAIN_SCALAR)? MIN_GAIN_SCALAR :scalar; //set lower limit of 0      
     this->gainScalar = scalar;
 }
 float WaveGen::getGainScalar(){

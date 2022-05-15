@@ -2,6 +2,7 @@
 #define _FX_H_
 #include "waveGen.h"
 #include "LFO.h"
+extern EventQueue PrintQueue;
 class FX{
     public:
         FX(WaveGen* synth):lfo(synth, 2.0f, 1.0f){    //set default LFO with frq of 2Hz and gain of 0.5
@@ -15,10 +16,14 @@ class FX{
             Synth->addFX(this);
         }
         void useLFOFrequencyScalar(){
-            Synth->setFrequencyScalar(lfo.getScalar());   
+            float fs = lfo.getScalar();
+            //PrintQueue.call(printf,"LFO Frequency Scalar: %5.4f\r\n", fs);
+            Synth->setFrequencyScalar(fs);   
         }
         void useLFOGainScalar(){
-            Synth->setGainScalar(lfo.getScalar());
+            float gs = lfo.getScalar()-0.5f;
+            //PrintQueue.call(printf,"LFO Gain Scalar: %5.4f\r\n", gs);
+            Synth->setGainScalar(gs);
         }
         void updateLFO(float frq, float gain){
                 lfo.setGain(gain);

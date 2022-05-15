@@ -25,8 +25,8 @@ BM_DAC dac('A', 5);
 //Create Synthasizer
 WaveGen Synth(SAMPLE_RATE);
 //add effects to synthsizer 
-Vibrato vib(&Synth, 2.0f, 1.0f);
-
+Vibrato vib(&Synth, 2.0f, 2.0f);
+Tremolo trem(&Synth, 10.0f, 0.5f);
 
 MIDI Midi;
 

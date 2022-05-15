@@ -77,7 +77,7 @@ float Key::getSample(){
     float sample = 0.0;
     float envGain = 1.0f;
     updateFrequencyScalar();
-    updateGainScalar();
+    //updateGainScalar();
     if (active){                        //if key not active, sample = 0
         angle += angularStep*frequencyScalar;
         angle = (angle > ((float)(waveRes - 1)))?(angle - ((float)(waveRes - 1))):(angle); //bound angle to limits
@@ -98,7 +98,8 @@ float Key::getSample(){
                 break;
         }
         envGain = runEnv();
-        sample = sample*velocity*envGain;
+        sample = sample*velocity*envGain;//*gainScalar;
+        //printf("Sample Params:\tsample: %5.4f,\tvelocity: %5.4f\tenvGain: %5.4f\tgainScalar: %5.4f\r\n", sample, velocity, envGain, gainScalar);
     }
     //printf("key Sample: %d\tangle: %d\r\n",(int)(100*sample), (unsigned int)angle);
     return sample;

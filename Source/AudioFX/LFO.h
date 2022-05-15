@@ -41,8 +41,10 @@ class LFO{
         }
         //printf("key Sample: %d\tangle: %d\r\n",(int)(100*sample), (unsigned int)angle);
         //return scalar centered around 1.0
+        //Scalar     = 1.0 + LFOgain*scalar = output Scalar
         //max scalar = 1.0 + (2* 0.5) = 2.0
         //min scalar = 1.0 + (2*-0.5) = 0.0
+        //printf("LFO");
         return (1.0 + LFOgain*scalar);
     }
 
@@ -69,15 +71,15 @@ class LFO{
 
     void setGain(float g){  //how much should the scalar vary
         //clamping
-        g = (g > 1.0f)?2.0f:g;
-        g = (g < 0)? 0.0f: g;
+        g = (g > LFO_MAX_GAIN)? LFO_MAX_GAIN : g;
+        g = (g < LFO_MIN_GAIN)? LFO_MIN_GAIN : g;
         //set gain
         this->LFOgain = g;
     }
     void setFrq(float frq){
         //clamping
-        frq = (frq > 40.0f) ?   40.0f   :   frq;    //clamp upper limit to 40Hz
-        frq = (frq < 0.2)   ?   0.2f    :   frq;    //clamp lower limit to 0.2Hz
+        frq = (frq > LFO_MAX_FREQ)? LFO_MAX_FREQ : frq;    //clamp upper limit to 40Hz
+        frq = (frq < LFO_MIN_FREQ)? LFO_MIN_FREQ : frq;    //clamp lower limit to 0.2Hz
         //set gain
         this->LFOfreq = frq;
         cycle_period_us = 1000000/(this->LFOfreq);

@@ -5,6 +5,7 @@
 #include "FX.h"
 
 class Tremolo : public FX{
+    public:
     Tremolo(WaveGen * Synth, float frequency, float gain):FX(Synth){
         updateLFO(frequency, gain);
         addToSynth();
