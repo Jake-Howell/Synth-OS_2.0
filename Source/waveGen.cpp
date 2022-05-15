@@ -1,5 +1,5 @@
 #include "waveGen.h"
-
+#include "AudioFX.h"
 using namespace std;
 
 extern EventQueue PrintQueue;
@@ -8,11 +8,12 @@ WaveGen::WaveGen(unsigned int sampleRate){
     for (int i = 0; i<KEY_COUNT; i++){  //create 10 key objects
         keys[i] = new Key(this);
     }
+    fx_count = 0;
     setSampleRate(sampleRate);	//set sample rate and calculate sample period
     setWaveRes(1024);			//calculate 1024 points in sine wave
     setWaveType(SIN);			//set wave type to SINE by default
     pressNote(88, 127);
-    pressNote(90, 127);
+    pressNote(92, 127);
 }
 
 void WaveGen::setSampleRate(unsigned int rate){
@@ -40,14 +41,7 @@ void WaveGen::setWaveRes(unsigned int res){	//set wave resoloution up to 1024 (s
 unsigned int WaveGen::getWaveRes(){
     return this->mWaveRes;
 }
-float WaveGen::getFrequencyScalar(){
-    return this->frqScalar;
-}
-void WaveGen::setFrequencyScalar(float s){
-    s = (s>2.0f)?   2.0f    :   s;  //clamp scaling to max 2.0X frequency
-    s = (s<0.5) ?   0.5f    :   s;  //clamp scaling to min 0.5X frequency
-    this->frqScalar = s;
-}
+
 void WaveGen::setWaveType(WAVE_TYPE type){			//select wave type
     this->mWaveType = type;
 }
@@ -106,7 +100,9 @@ float WaveGen::sin_lut(unsigned int angle){
 float WaveGen::produceSample(){
     //toneParams note; 
     volatile float sample = 0.0f;	//if note is NOT active, output will remain 0.0
-
+    for(int i = 0; i < fx_count; i++){
+        audioFX[i]->updateFX();
+    }
     for (int i = 0; i<KEY_COUNT; i++){
         sample += keys[i]->getSample();      //get sample from each key
     }
@@ -118,4 +114,29 @@ float WaveGen::produceSample(){
     sample = (sample > 1.0f)?1.0f:sample;
     sample = (sample < 0.0f)?0.0f:sample;
     return sample;   //return output after scaling
+}
+
+void WaveGen::addFX(FX* fx){
+    if(fx_count < (MAX_FX-1)){  //if there is space for a new FX object
+        audioFX[fx_count] = fx; //add FX object to array
+        fx_count++;             //increment fx_count
+    }else{
+        PrintQueue.call(printf, "No space for new Audio effects\r\n");
+    }
+}
+void WaveGen::setFrequencyScalar(float scalar){
+    scalar = (scalar>2.0f)?2.0f:scalar; //set upper limit to 2X frequency
+    scalar = (scalar<0.5f)?0.5f:scalar; //set lower limit to 0.5X frequency
+    this->frqScalar = scalar;
+}
+float WaveGen::getFrequencyScalar(){
+    return this->frqScalar;
+}
+void WaveGen::setGainScalar(float scalar){
+    scalar = (scalar>1.0f)?1.0f:scalar; //set upper gain limit of 1
+    scalar = (scalar < 0.0f)?0.0f:scalar; //set lower limit of 0      
+    this->gainScalar = scalar;
+}
+float WaveGen::getGainScalar(){
+    return this->gainScalar;
 }

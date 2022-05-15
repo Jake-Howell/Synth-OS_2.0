@@ -76,9 +76,10 @@ float Key::runEnv(){
 float Key::getSample(){
     float sample = 0.0;
     float envGain = 1.0f;
-    float FrqScalar = Synth->getFrequencyScalar();
+    updateFrequencyScalar();
+    updateGainScalar();
     if (active){                        //if key not active, sample = 0
-        angle += angularStep;
+        angle += angularStep*frequencyScalar;
         angle = (angle > ((float)(waveRes - 1)))?(angle - ((float)(waveRes - 1))):(angle); //bound angle to limits
         switch(Synth->getWaveType()){
             case SIN:
@@ -121,4 +122,16 @@ float Key::getSaw(){
 float Key::getSqu(){
     float sample = ((angle >= (float)waveRes/2)?1:0);  
     return sample;
+}
+
+void Key::updateFrequencyScalar(){
+    float fs = Synth->getFrequencyScalar();
+    fs = (fs>2.0f)?2.0f:fs; //clamp upper scaling limit to 2X
+    fs = (fs<0.5f)?0.5f:fs; //clamp lower scaling limit to 1/2X
+    this->frequencyScalar = fs;
+}
+void Key::updateGainScalar(){
+    float gs = Synth->getGainScalar();
+    gs = (gs>2.0f)?1.0f:gs; //clamp upper scaling limit to 2X
+    gs = (gs<0.5f)?0.0f:gs; //clamp lower scaling limit to 1/2X  
 }

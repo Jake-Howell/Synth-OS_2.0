@@ -14,7 +14,10 @@ class Key{
         void setKeyParams(unsigned int noteNum, unsigned int velocity);
         void releaseKey();
         bool isActive();
+        
     private:
+        void updateFrequencyScalar();
+        void updateGainScalar();
         float runEnv();
         float getSin();
         float getTri();
@@ -28,6 +31,8 @@ class Key{
         char   MIDInum;        //MIDI code for note
         float  period_us;      //wavelength
         volatile float  velocity;       //loudness of note (gain)
+        float frequencyScalar;
+        float gainScalar;
 
         Envelope* envelope;
         ASDR_STATE_t adsr_state;

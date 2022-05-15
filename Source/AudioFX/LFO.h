@@ -14,33 +14,39 @@ class LFO{
         setFrq(frq);
         setGain(gain);
         angle = 0.0f;    
+        active = true;
     }
 
-    float getSample(){
-            float sample;
+    float getScalar(){
+        float scalar = 1.0; //if note note active scalar = 1
+        if(active){
             angle += angularStep;
             angle = (angle > ((float)(waveRes - 1)))?(angle - ((float)(waveRes - 1))):(angle); //bound angle to limits
             switch(Synth->getWaveType()){
                 case SIN:
-                    sample = getSin();
+                    scalar = getSin();      //
                     break;
                 case TRI:
-                    sample = getTri();      //convert sine to tri
+                    scalar = getTri();      //convert sine to tri
                     break;
                 
                 case SAW:
-                    sample = getSaw();      //convert sine to saw
+                    scalar = getSaw();      //convert sine to saw
                     break;
                 
                 case SQU:
-                    sample = getSqu();      //convert sine to square
+                    scalar = getSqu();      //convert sine to square
                     break;
             }
-            sample = sample;
+        }
         //printf("key Sample: %d\tangle: %d\r\n",(int)(100*sample), (unsigned int)angle);
-        return sample*LFOgain;
+        //return scalar centered around 1.0
+        //max scalar = 1.0 + (2* 0.5) = 2.0
+        //min scalar = 1.0 + (2*-0.5) = 0.0
+        return (1.0 + LFOgain*scalar);
     }
 
+    //returns sin value from -0.5 to +0.5
     float getSin(){
         //round angle to nearest intager within wave resoloution
         float sample = (Synth->sin_lut((int)angle));
@@ -61,9 +67,9 @@ class LFO{
         return sample;
     }
 
-    void setGain(float g){
+    void setGain(float g){  //how much should the scalar vary
         //clamping
-        g = (g > 1.0f)?1.0f:g;
+        g = (g > 1.0f)?2.0f:g;
         g = (g < 0)? 0.0f: g;
         //set gain
         this->LFOgain = g;
@@ -80,6 +86,7 @@ class LFO{
     }
     private:
         WaveGen * Synth;
+        bool active;
         float LFOgain;
         float samplePeriod_us;
         float cycle_period_us;

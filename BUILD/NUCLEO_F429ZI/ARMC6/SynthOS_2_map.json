@@ -35,10 +35,10 @@
     {
         "module": "Source\\Key.o",
         "size": {
-            ".text": 1170,
+            ".text": 1244,
             ".data": 0,
             ".bss": 0,
-            ".text-delta": 4,
+            ".text-delta": 0,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -68,21 +68,21 @@
     {
         "module": "Source\\main.o",
         "size": {
-            ".text": 1432,
+            ".text": 2246,
             ".data": 0,
-            ".bss": 5864,
+            ".bss": 5936,
             ".text-delta": 0,
             ".data-delta": 0,
-            ".bss-delta": -8
+            ".bss-delta": 0
         }
     },
     {
         "module": "Source\\waveGen.o",
         "size": {
-            ".text": 558,
+            ".text": 736,
             ".data": 0,
             ".bss": 0,
-            ".text-delta": -10,
+            ".text-delta": 0,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -101,7 +101,7 @@
     {
         "module": "[lib]\\fz_wm.l",
         "size": {
-            ".text": 1606,
+            ".text": 2074,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -243,10 +243,10 @@
     },
     {
         "summary": {
-            "static_ram": 33208,
-            "static_ram_delta": -8,
-            "total_flash": 66424,
-            "total_flash_delta": -6
+            "static_ram": 33280,
+            "static_ram_delta": 0,
+            "total_flash": 67958,
+            "total_flash_delta": 0
         }
     }
 ]

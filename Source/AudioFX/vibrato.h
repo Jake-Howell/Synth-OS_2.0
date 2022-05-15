@@ -3,18 +3,20 @@
 #include "mbed.h"
 #include "global_defs.hpp"
 #include "FX.h"
-class Vibrato : public FX{
-    Vibrato(WaveGen* Synth, float frequency, float gain):FX(Synth){
-        lfo.setGain(gain);
-        lfo.setFrq(frequency);
-    }
 
-    //override control to control frequency
-    void control(float controlParam) override{
-        Synth->setFrequencyScalar(controlParam);    
+class Vibrato : public FX{
+    public:
+    Vibrato(WaveGen* Synth, float frequency, float gain):FX(Synth){
+        updateLFO(frequency, gain);
+        addToSynth();
     }
-    
+    //override control to control frequency
+    void updateFX() override{
+         //tell FX class to scale synth frequency with lfo output
+         useLFOFrequencyScalar();  
+    }
 };
+
 
 
 #endif

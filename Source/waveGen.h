@@ -10,6 +10,7 @@
 #include "global_defs.hpp"
 #include "Key.h"
 
+class FX;
 
 class WaveGen{
     public:
@@ -27,21 +28,26 @@ class WaveGen{
         WAVE_TYPE getWaveType();
         float sin_lut(unsigned int angle);
         float getFrequencyScalar();
-        void setFrequencyScalar(float);
+        float getGainScalar();
+        void setFrequencyScalar(float scalar);
+        void setGainScalar(float scalar);
+        void addFX(FX* fx);
 
     private:
         Key *keys[KEY_COUNT];
-        FX *audioFX[]   //TODO add list of audio FX to run and call vibrato
+        FX *audioFX[MAX_FX];   //TODO add list of audio FX to run and call vibrato
+        uint16_t fx_count;
         WAVE_TYPE mWaveType;            //Type of wave to be generated (SIN, SAW, TRI, SQU)
         char mPitchwheel;
         //Synth Params
-        float frqScalar;
         unsigned int mSampleRate;       //48KHz sample rate
         float mSamplePeriod_us;         //10.41667 us @ 96KHz
         unsigned int active_keys;       //store the number of active keys
 		unsigned int mWaveRes = 1024;   //resoloution of wave table
 		float mSineTable[1024];		    //sinetable from 0 to 90 degrees
-
+        //FX Params
+        float frqScalar;
+        float gainScalar;
 };
 
 #endif

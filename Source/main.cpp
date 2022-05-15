@@ -1,12 +1,12 @@
 #include "mbed.h"
-#include "global_defs.hpp"
+#include "AudioFX.h"
 #include "Threads.h"
-//#include "i2S.h"
+
 #include "BM_DAC.hpp"
 #include "rtos/ThisThread.h"
 #include "HW_Timer.h"
 #include "cbuff.hpp"
-#include "waveGen.h"
+
 #include "MIDI_Decoder.hpp"
 #include "RotaryEncoder.h"
 #include <cstdint>
@@ -22,7 +22,12 @@ Circular_Buff<float> DAC_buffer(BUFFER_SIZE);
 
 //AnalogOut dac(PA_5);
 BM_DAC dac('A', 5);
+//Create Synthasizer
 WaveGen Synth(SAMPLE_RATE);
+//add effects to synthsizer 
+Vibrato vib(&Synth, 2.0f, 1.0f);
+
+
 MIDI Midi;
 
 RotaryEncoder RE_D(RE_D_Pins);
