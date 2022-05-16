@@ -5,6 +5,7 @@
 #include "global_defs.hpp"
 #include <cstdint>
 
+extern EventQueue PrintQueue;
 
 class RotaryEncoder{
     public:
@@ -418,6 +419,7 @@ class RotaryEncoder{
                     break;
                 default:
                     p = 0;
+                    PrintQueue.call(printf, "Corrupted Gray Code: 0x%2X\t", GC);
                     break;
             }
             return p;

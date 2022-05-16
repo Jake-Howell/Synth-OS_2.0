@@ -10,9 +10,9 @@ void start_threads(){
     //start print queue
     PrintThread.start(printer);
     //start updating IO 
-    //IOCheckThread.start(updateIO);
+    IOCheckThread.start(updateIO);
     //start converting MIDI data to control device
-    //MIDI_Thread.start(MIDI_Converter);
+    MIDI_Thread.start(MIDI_Converter);
     //start producing samples (High Priority thread)
     SampleProducerThread.start(sampleGen);              //start sample producer thread
 }
@@ -40,7 +40,7 @@ void sampleGen(){    //FIFO Producer Thread
 
 //convert serial data into midi commands
 void MIDI_Converter(){
-
+    PrintQueue.call(printf, "Starting Midi Converter\r\n");
     MIDI_cmd_t cmd;
     MIDI_Serial_Bloak_t chunk;  //store 4 bytes of midi data to convert to a command
     while(true){  //loop until buffer is empty
@@ -68,6 +68,7 @@ void printer(){
 }
 
 void updateIO(){
+    PrintQueue.call(printf, "Starting IO Check\r\n");
     while(1){
         RE_D.update_pos();
         uint8_t pos = RE_D.getPos();

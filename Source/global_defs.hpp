@@ -29,6 +29,7 @@
 #define MAX_FRQ_SCALAR  2.0f
 
 #define MIN_GAIN_SCALAR 0.0f
+
 #define MIN_FRQ_SCALAR  0.5f
 
 inline void INIT_GLOBAL_FLAG() {GLOBAL_FLAG_PORT->MODER &= ~(3u<<(GLOBAL_FLAG_PIN*2));GLOBAL_FLAG_PORT->MODER |=  (1u<<(GLOBAL_FLAG_PIN*2));GLOBAL_FLAG_PORT->PUPDR |= PullDown;}
@@ -118,14 +119,25 @@ typedef struct {
 }RE_Pins;
 
 const RE_Pins RE_D_Pins{
-    PD_2,           //D1
-    PE_5,           //D2
-    PF_8,           //D3
-    PF_9,           //D4
-    PD_10,           //D5
-    PF_7,           //D6
-    PE_3,           //D7
-    PE_4           //D8
+    PE_5,//D1 
+    PE_3,//D2
+    PD_2,//D3 
+    PE_4,//D4 
+    PG_1,//D5
+    PF_9,//D6
+    PF_8,//D7
+    PF_7 //D8
+};
+
+const RE_Pins RE_C_Pins{
+    PD_13,
+    PB_2,
+    PD_11,
+    PD_12,
+    PE_2,
+    PA_0,
+    PB_0,
+    PE_0
 };
 
 

@@ -35,7 +35,7 @@
     {
         "module": "Source\\Key.o",
         "size": {
-            ".text": 1230,
+            ".text": 1242,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -46,7 +46,7 @@
     {
         "module": "Source\\MIDI_Decoder.o",
         "size": {
-            ".text": 354,
+            ".text": 596,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -57,7 +57,7 @@
     {
         "module": "Source\\Threads.o",
         "size": {
-            ".text": 540,
+            ".text": 2457,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -68,9 +68,9 @@
     {
         "module": "Source\\main.o",
         "size": {
-            ".text": 2614,
+            ".text": 1428,
             ".data": 0,
-            ".bss": 5984,
+            ".bss": 5888,
             ".text-delta": 0,
             ".data-delta": 0,
             ".bss-delta": 0
@@ -79,10 +79,10 @@
     {
         "module": "Source\\waveGen.o",
         "size": {
-            ".text": 814,
+            ".text": 1192,
             ".data": 0,
             ".bss": 0,
-            ".text-delta": 10,
+            ".text-delta": 0,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -178,7 +178,7 @@
     {
         "module": "mbed-os\\drivers",
         "size": {
-            ".text": 3890,
+            ".text": 3970,
             ".data": 0,
             ".bss": 1780,
             ".text-delta": 0,
@@ -222,7 +222,7 @@
     {
         "module": "mbed-os\\rtos",
         "size": {
-            ".text": 1957,
+            ".text": 1995,
             ".data": 0,
             ".bss": 8,
             ".text-delta": 0,
@@ -243,10 +243,10 @@
     },
     {
         "summary": {
-            "static_ram": 33328,
+            "static_ram": 33232,
             "static_ram_delta": 0,
-            "total_flash": 67922,
-            "total_flash_delta": 10
+            "total_flash": 69403,
+            "total_flash_delta": 0
         }
     }
 ]

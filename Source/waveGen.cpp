@@ -14,8 +14,8 @@ WaveGen::WaveGen(unsigned int sampleRate){
     setSampleRate(sampleRate);	//set sample rate and calculate sample period
     setWaveRes(1024);			//calculate 1024 points in sine wave
     setWaveType(SIN);			//set wave type to SINE by default
-    pressNote(88, 127);
-    pressNote(90, 127);
+    //pressNote(88, 127);
+    //pressNote(90, 127);
 }
 
 void WaveGen::setSampleRate(unsigned int rate){
@@ -63,7 +63,9 @@ void WaveGen::pressNote(char noteNum, char velocity){	//add note to wave gen, an
 
 void WaveGen::releaseNote(int MIDInum){
     for (int i = 0; i < KEY_COUNT; i++){
-        if (!(keys[i]->isActive()) && (keys[i]->getMIDInum() == MIDInum)){    //if key is not active, use key to play note
+        //if key is active, and matches the signaled midi num
+        if (keys[i]->isActive() && (keys[i]->getMIDInum() == MIDInum)){    
+            //put key into release state
             keys[i]->releaseKey();
             active_keys--;
             return;

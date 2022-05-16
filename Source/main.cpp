@@ -14,23 +14,25 @@
 #include <stdint.h>
 DigitalOut LED(LED1);
 UnbufferedSerial PC_Coms(USBTX, USBRX, 115200);
-UnbufferedSerial RPi_Coms(PD_5, PD_6, 115200);
+UnbufferedSerial RPi_Coms(PD_5, PD_6, 57600);
 
 SPI audio_in(adc.MOSI, adc.MISO, adc.SCLK, adc.CS);
 
 Circular_Buff<float> DAC_buffer(BUFFER_SIZE);
+
+//InterruptIn USER_BUTTON;
 
 //AnalogOut dac(PA_5);
 BM_DAC dac('A', 5);
 //Create Synthasizer
 WaveGen Synth(SAMPLE_RATE);
 //add effects to synthsizer 
-Vibrato vib(&Synth, 2.0f, 2.0f);
-Tremolo trem(&Synth, 10.0f, 0.5f);
+//Vibrato vib(&Synth, 2.0f, 2.0f);
+//Tremolo trem(&Synth, 10.0f, 0.5f);
 
 MIDI Midi;
 
-RotaryEncoder RE_D(RE_D_Pins);
+RotaryEncoder RE_D(RE_C_Pins);
 
 Thread SampleProducerThread(osPriorityHigh, OS_STACK_SIZE, nullptr, "Sample Producer");
 Thread PrintThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "Print Thread");
