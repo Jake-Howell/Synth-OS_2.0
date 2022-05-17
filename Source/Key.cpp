@@ -8,11 +8,13 @@ Key::Key(WaveGen* synth){
     setKeyParams(127,0);    //set key params for OFF note
     adsr_state = ATTACK;    //start envelope in attack state
     //set Envelope params for key
-    this->envSetup.attack_steps     = 1.0*SAMPLE_RATE;  //calculate number of steps for 0.5 secons
-    this->envSetup.decay_steps      = 1.0*SAMPLE_RATE;  //calculate number of steps for 1 second decay
-    this->envSetup.release_steps    = 3.0*SAMPLE_RATE;  //calculate number of steps for 3 second release
-    this->envSetup.attack_gain      = 1.0f;
-    this->envSetup.sustain_gain     = 0.6f;
+    ASDR_Params_t asdr_setup = synth->getASDR_Params();
+    
+    this->envSetup.attack_steps     = asdr_setup.attack_time*SAMPLE_RATE; //calculate number of steps for 0.5 secons
+    this->envSetup.decay_steps      = asdr_setup.decay_time*SAMPLE_RATE;  //calculate number of steps for 1 second decay
+    this->envSetup.release_steps    = asdr_setup.release_time*SAMPLE_RATE;  //calculate number of steps for 3 second release
+    this->envSetup.attack_gain      = asdr_setup.attack_gain;
+    this->envSetup.sustain_gain     = asdr_setup.sustain_gain;
     envelope = new LinearASDR(this, envSetup);
 }
 void Key::setKeyParams(unsigned int noteNum, unsigned int vel){

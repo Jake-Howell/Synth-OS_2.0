@@ -6,7 +6,7 @@
 #include "rtos/ThisThread.h"
 #include "HW_Timer.h"
 #include "cbuff.hpp"
-
+#include "global_defs.hpp"
 #include "MIDI_Decoder.hpp"
 #include "RotaryEncoder.h"
 #include <cstdint>
@@ -14,12 +14,11 @@
 #include <stdint.h>
 DigitalOut LED(LED1);
 UnbufferedSerial PC_Coms(USBTX, USBRX, 115200);
-UnbufferedSerial RPi_Coms(PD_5, PD_6, 57600);
+UnbufferedSerial RPi_Coms(PD_5, PD_6, 115200);
 
-SPI audio_in(adc.MOSI, adc.MISO, adc.SCLK, adc.CS);
 
 Circular_Buff<float> DAC_buffer(BUFFER_SIZE);
-
+//DigitalIn(PC_12);
 //InterruptIn USER_BUTTON;
 
 //AnalogOut dac(PA_5);
@@ -27,12 +26,13 @@ BM_DAC dac('A', 5);
 //Create Synthasizer
 WaveGen Synth(SAMPLE_RATE);
 //add effects to synthsizer 
-//Vibrato vib(&Synth, 2.0f, 2.0f);
-//Tremolo trem(&Synth, 10.0f, 0.5f);
+Vibrato vib(&Synth, 10.0f, 0.02f);  //vibrato @ 10Hz, +-2% frequency 
+//Tremolo trem(&Synth, 10.0f, 0.9f);    //Tremolo @ 10Hz +- 90% gain
 
 MIDI Midi;
 
-RotaryEncoder RE_D(RE_C_Pins);
+RotaryEncoder RE_D(RE_D_Pins, &vib, LFO_GAIN);
+RotaryEncoder RE_C(RE_C_Pins, &vib, LFO_RATE);
 
 Thread SampleProducerThread(osPriorityHigh, OS_STACK_SIZE, nullptr, "Sample Producer");
 Thread PrintThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "Print Thread");
@@ -41,7 +41,7 @@ Thread IOCheckThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "IO Check Thread"
 
 
 EventQueue PrintQueue;
-Ticker sampleTimer;
+
 
 //ISR Callback functions
 void getUserInput();    
@@ -53,10 +53,9 @@ int main()
     INIT_GLOBAL_FLAG();
     SystemCoreClockUpdate();
     printf("\r\nSystem Core Clck:\t%d MHz\r\n", (SystemCoreClock/1000000));
-
-    //8Synth.pressNote(50,100);
-
-//    Synth.pressNote(73,100);
+    Synth.setWaveType(TRI);
+    //Synth.pressNote(50,100);
+    //Synth.pressNote(73,100);
     RPi_Coms.attach(&getUserInput, SerialBase::RxIrq);   //call get user input on usart rx interupt 
     DAC_buffer.setThreshold((BUFFER_SIZE-1));
 

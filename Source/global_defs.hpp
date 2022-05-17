@@ -35,8 +35,21 @@
 inline void INIT_GLOBAL_FLAG() {GLOBAL_FLAG_PORT->MODER &= ~(3u<<(GLOBAL_FLAG_PIN*2));GLOBAL_FLAG_PORT->MODER |=  (1u<<(GLOBAL_FLAG_PIN*2));GLOBAL_FLAG_PORT->PUPDR |= PullDown;}
 inline void PULSE_GLOBAL_FLAG()     {GLOBAL_FLAG_PORT->BSRR |= (1u<<GLOBAL_FLAG_PIN); GLOBAL_FLAG_PORT->BSRR |= (1u<<(GLOBAL_FLAG_PIN + 16));}
 inline void TOGGLE_GLOBAL_FLAG()    {GLOBAL_FLAG_PORT->ODR ^= (1u<<GLOBAL_FLAG_PIN);}
+
 typedef enum {ATTACK = 0, DECAY, SUSTAIN, RELEASE, OFF}ASDR_STATE_t;
+
 typedef enum {SIN = 0, TRI, SAW, SQU}WAVE_TYPE;	
+
+//ASDR SETTINGS RELATIVE TO TIME
+typedef struct{
+    float attack_time;
+    float decay_time;
+    float release_time;
+    float attack_gain;
+    float sustain_gain;
+}ASDR_Params_t;
+
+//ASDR SETTINGS RELATIVE TO TIME STEPS
 typedef struct {
     uint32_t attack_steps;
     uint32_t decay_steps;
@@ -44,15 +57,7 @@ typedef struct {
     float attack_gain;
     float sustain_gain;
 }EnvParams_t;
-typedef struct{
-    bool    active;         //if note is not active, skip any calculations
-    float  angularStep;    //calculated angular step per sample
-    float  Wo;             //angle
-    char    MIDInum;        //MIDI code for note
-    float  period_us;      //wavelength
-    float  velocity;       //loudness of note (gain)
-    
-}toneParams;
+
 typedef struct{
 	char type;
 	char param1;
@@ -66,10 +71,6 @@ typedef struct{
     uint8_t cs; //checksum
 }MIDI_Serial_Bloak_t;
 
-typedef struct{
-	char num;
-	char velocity;
-}note_t;
 
 enum MIDI_TYPES
 {
@@ -79,33 +80,6 @@ enum MIDI_TYPES
     PITCHWHEEL
 };
 
-typedef struct {
-    PinName SDAT;
-    PinName LRck;
-    PinName Mclk;
-    PinName Bclk;
-}I2S_Pins;
-
-typedef struct{
-    PinName MOSI;
-    PinName MISO;
-    PinName SCLK;
-    PinName CS;
-}SPI_Pins;
-
-const I2S_Pins ext_dac{
-    PB_15,              //I2S2_SDO  AF5
-    PB_12,              //I2S2_LR   AF5
-    PC_6,               //I2SS_Mclk AF5
-    PB_13               //I2S2_Bclk AF5
-};
-
-const SPI_Pins adc {
-PB_5,
-PA_6,
-PA_5,
-PD_14
-};
 
 typedef struct {
     PinName D0;

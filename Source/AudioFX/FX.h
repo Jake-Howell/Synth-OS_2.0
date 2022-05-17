@@ -12,6 +12,7 @@ class FX{
         //to chose what synth parameter they 
         //want the LFO to modify
         virtual void updateFX() = 0;   
+        void setControlIO();
         void addToSynth(){
             Synth->addFX(this);
         }
@@ -28,6 +29,12 @@ class FX{
         void updateLFO(float frq, float gain){
                 lfo.setGain(gain);
                 lfo.setFrq(frq);
+        }
+        void updateLFOgain(float gain){
+            lfo.setGain(gain);
+        }
+        void updateLFOFrq(float frq){
+            lfo.setFrq(frq);
         }
     private:
         LFO lfo;                    //use key as LFO

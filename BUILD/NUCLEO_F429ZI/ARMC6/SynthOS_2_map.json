@@ -35,7 +35,7 @@
     {
         "module": "Source\\Key.o",
         "size": {
-            ".text": 1242,
+            ".text": 1302,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -46,7 +46,7 @@
     {
         "module": "Source\\MIDI_Decoder.o",
         "size": {
-            ".text": 596,
+            ".text": 734,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -57,7 +57,7 @@
     {
         "module": "Source\\Threads.o",
         "size": {
-            ".text": 2457,
+            ".text": 3091,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -68,10 +68,10 @@
     {
         "module": "Source\\main.o",
         "size": {
-            ".text": 1428,
+            ".text": 2104,
             ".data": 0,
-            ".bss": 5888,
-            ".text-delta": 0,
+            ".bss": 5904,
+            ".text-delta": 4,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -79,7 +79,7 @@
     {
         "module": "Source\\waveGen.o",
         "size": {
-            ".text": 1192,
+            ".text": 1394,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -167,7 +167,7 @@
     {
         "module": "mbed-os\\connectivity",
         "size": {
-            ".text": 3197,
+            ".text": 3125,
             ".data": 0,
             ".bss": 12724,
             ".text-delta": 0,
@@ -178,9 +178,9 @@
     {
         "module": "mbed-os\\drivers",
         "size": {
-            ".text": 3970,
+            ".text": 2552,
             ".data": 0,
-            ".bss": 1780,
+            ".bss": 0,
             ".text-delta": 0,
             ".data-delta": 0,
             ".bss-delta": 0
@@ -200,7 +200,7 @@
     {
         "module": "mbed-os\\hal",
         "size": {
-            ".text": 2066,
+            ".text": 1476,
             ".data": 4,
             ".bss": 58,
             ".text-delta": 0,
@@ -211,7 +211,7 @@
     {
         "module": "mbed-os\\platform",
         "size": {
-            ".text": 6588,
+            ".text": 6522,
             ".data": 64,
             ".bss": 285,
             ".text-delta": 0,
@@ -233,7 +233,7 @@
     {
         "module": "mbed-os\\targets",
         "size": {
-            ".text": 15655,
+            ".text": 12476,
             ".data": 9,
             ".bss": 758,
             ".text-delta": 0,
@@ -243,10 +243,10 @@
     },
     {
         "summary": {
-            "static_ram": 33232,
+            "static_ram": 31468,
             "static_ram_delta": 0,
-            "total_flash": 69403,
-            "total_flash_delta": 0
+            "total_flash": 65788,
+            "total_flash_delta": 4
         }
     }
 ]

@@ -1,21 +1,41 @@
 #ifndef _RE_H_
 #define _RE_H_
-
+#include "AudioFX.h"
 #include "mbed.h"
 #include "global_defs.hpp"
 #include <cstdint>
 
+typedef enum{LFO_RATE = 0, LFO_GAIN}LFO_Control_t;
 extern EventQueue PrintQueue;
 
 class RotaryEncoder{
     public:
-        RotaryEncoder(RE_Pins RE):bus(RE.D0,RE.D1, RE.D2, RE.D3,RE.D4,RE.D5, RE.D6, RE.D7){
+        RotaryEncoder(RE_Pins RE, FX* audioEffect, LFO_Control_t ctrlParam):bus(RE.D0,RE.D1, RE.D2, RE.D3,RE.D4,RE.D5, RE.D6, RE.D7){
+            fx = audioEffect;   //set which effect the rotary encoder will control
+            this->controlParam = ctrlParam;
             this->pos = 0;
         }
 
         void update_pos(){
-            GC_latest = bus.read();
-            this->pos = convert_GreyCode(GC_latest);
+            uint8_t last_pos = this->pos;               //store last position
+            GC_latest = bus.read();                     //read grey code
+            this->pos = convert_GreyCode(GC_latest);    //convert grey code to position 
+            if(this->pos != last_pos){
+                controlFX((float)pos/127);              //update audio effects using position of rotary encoder
+            }
+        }
+        void controlFX(float scalar){
+            switch(this->controlParam){
+                case LFO_GAIN:              //update how much LFO modulates a signal
+                    fx->updateLFOgain(scalar);  //send 0 to 1
+                    PrintQueue.call(printf,"LFO gain: %5.4f\r\n", scalar);
+                break;
+                case LFO_RATE:              //update the frequency of the LFO
+                    float frq = 10*scalar;
+                    fx->updateLFOFrq(frq); //send between 0 and 10 Hz
+                    PrintQueue.call(printf, "LFO Frequency: %5.4f\r\n", frq);
+                break;
+            }
         }
         uint8_t getPos(){
             return this->pos;
@@ -27,6 +47,8 @@ class RotaryEncoder{
             return this->GC_latest;
         }
     private:
+        FX* fx;
+        LFO_Control_t controlParam;
         BusIn bus;
         uint8_t pos; //stores clast read position of the rotary encoder (0 - 127)
         uint8_t GC_latest;

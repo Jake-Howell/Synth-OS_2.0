@@ -12,7 +12,8 @@ void MIDI::serialToMIDIconverter(MIDI_Serial_Bloak_t d){
         currentCMD.param2 = d.d2;
         cmdBuffer.put(currentCMD);				//add formatted data to buffer
     }else{
-        PrintQueue.call(printf, "Corrupted MIDI CMD\r\n");
+        PrintQueue.call(printf, "Corrupted MIDI CMD\tType: %d\tParam1: %d\tParam2: %d\tcksum: %d\r\n", d.d0, d.d1, d.d2, d.cs);
+        cmdBuffer.reset();
     }
 }
 

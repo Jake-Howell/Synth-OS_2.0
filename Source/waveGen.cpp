@@ -5,6 +5,12 @@ using namespace std;
 extern EventQueue PrintQueue;
 
 WaveGen::WaveGen(unsigned int sampleRate){
+    //load default asdr params
+    ASDR_Params.attack_gain = 1.0f;
+    ASDR_Params.sustain_gain = 0.7f;
+    ASDR_Params.attack_time = 0.2f;
+    ASDR_Params.decay_time = 0.4f;
+    ASDR_Params.release_time = 1.5f;
     for (int i = 0; i<KEY_COUNT; i++){  //create 10 key objects
         keys[i] = new Key(this);
     }
@@ -14,8 +20,7 @@ WaveGen::WaveGen(unsigned int sampleRate){
     setSampleRate(sampleRate);	//set sample rate and calculate sample period
     setWaveRes(1024);			//calculate 1024 points in sine wave
     setWaveType(SIN);			//set wave type to SINE by default
-    //pressNote(88, 127);
-    //pressNote(90, 127);
+
 }
 
 void WaveGen::setSampleRate(unsigned int rate){
@@ -144,4 +149,11 @@ void WaveGen::setGainScalar(float scalar){
 }
 float WaveGen::getGainScalar(){
     return this->gainScalar;
+}
+
+void WaveGen::setASDR(ASDR_Params_t env){
+    this->ASDR_Params = env;
+}
+ASDR_Params_t WaveGen::getASDR_Params(){
+    return this->ASDR_Params;
 }

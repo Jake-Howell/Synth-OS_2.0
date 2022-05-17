@@ -32,10 +32,13 @@ class WaveGen{
         void setFrequencyScalar(float scalar);
         void setGainScalar(float scalar);
         void addFX(FX* fx);
+        void setASDR(ASDR_Params_t env);
+        ASDR_Params_t getASDR_Params();
 
     private:
         Key *keys[KEY_COUNT];
         FX *audioFX[MAX_FX];   //TODO add list of audio FX to run and call vibrato
+        ASDR_Params_t ASDR_Params;
         uint16_t fx_count;
         WAVE_TYPE mWaveType;            //Type of wave to be generated (SIN, SAW, TRI, SQU)
         char mPitchwheel;
