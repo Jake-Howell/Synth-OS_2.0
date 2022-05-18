@@ -7,6 +7,7 @@
 class Vibrato : public FX{
     public:
     Vibrato(WaveGen* Synth, float frequency, float gain):FX(Synth){
+        name = "Vibrato";
         updateLFO(frequency, gain);
         addToSynth();
     }
@@ -15,6 +16,7 @@ class Vibrato : public FX{
          //tell FX class to scale synth frequency with lfo output
          useLFOFrequencyScalar();  
     }
+    
 };
 
 

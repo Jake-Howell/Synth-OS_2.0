@@ -1,6 +1,7 @@
 #ifndef _WAVE_GEN_H_
 #define _WAVE_GEN_H_
 
+#include <cstdint>
 #define PI 3.141592654
 
 #include "note_periods.cpp"
@@ -34,6 +35,7 @@ class WaveGen{
         void addFX(FX* fx);
         void setASDR(ASDR_Params_t env);
         ASDR_Params_t getASDR_Params();
+        void controlChange(uint8_t ctrl_num, uint8_t value);
 
     private:
         Key *keys[KEY_COUNT];

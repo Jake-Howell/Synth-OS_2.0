@@ -2,10 +2,11 @@
 #define _FX_H_
 #include "waveGen.h"
 #include "LFO.h"
+#include "cbuff.hpp"
 extern EventQueue PrintQueue;
 class FX{
     public:
-        FX(WaveGen* synth):lfo(synth, 2.0f, 1.0f){    //set default LFO with frq of 2Hz and gain of 0.5
+        FX(WaveGen* synth):lfo(synth){    //set default LFO with frq of 2Hz and gain of 0.5
             this->Synth = synth;    //get synth context
         }
         //force programmer to implement updateFX()
@@ -36,8 +37,13 @@ class FX{
         void updateLFOFrq(float frq){
             lfo.setFrq(frq);
         }
+        const char* getName(){
+            return this->name;
+        }
+        LFO lfo;                    //Create Low Frequency Oscilator
+    protected:
+        const char * name;
     private:
-        LFO lfo;                    //use key as LFO
         float controlParameter;     //give control parameter
         WaveGen * Synth;            //get Synth pointer        
 };

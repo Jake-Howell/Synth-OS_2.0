@@ -35,7 +35,7 @@
     {
         "module": "Source\\Key.o",
         "size": {
-            ".text": 1302,
+            ".text": 1410,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -46,7 +46,7 @@
     {
         "module": "Source\\MIDI_Decoder.o",
         "size": {
-            ".text": 734,
+            ".text": 752,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -68,10 +68,10 @@
     {
         "module": "Source\\main.o",
         "size": {
-            ".text": 2104,
+            ".text": 2278,
             ".data": 0,
-            ".bss": 5904,
-            ".text-delta": 4,
+            ".bss": 5936,
+            ".text-delta": 0,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -79,7 +79,7 @@
     {
         "module": "Source\\waveGen.o",
         "size": {
-            ".text": 1394,
+            ".text": 1674,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -101,7 +101,7 @@
     {
         "module": "[lib]\\fz_wm.l",
         "size": {
-            ".text": 1606,
+            ".text": 2074,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -243,10 +243,10 @@
     },
     {
         "summary": {
-            "static_ram": 31468,
+            "static_ram": 31500,
             "static_ram_delta": 0,
-            "total_flash": 65788,
-            "total_flash_delta": 4
+            "total_flash": 66836,
+            "total_flash_delta": 0
         }
     }
 ]

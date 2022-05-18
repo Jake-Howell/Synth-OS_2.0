@@ -6,11 +6,23 @@
 
 class LFO{
     public:
+    LFO(WaveGen* synth){
+        this->Synth = synth;
+        this->samplePeriod_us = Synth->getSamplePeriod_us();
+
+        this->waveRes = Synth->getWaveRes();
+        setWaveType(SIN);
+        setFrq(0);
+        setGain(0);
+        angle = 0.0f;    
+        active = true;
+    }
     LFO(WaveGen* synth, float frq, float gain){
         this->Synth = synth;
         this->samplePeriod_us = Synth->getSamplePeriod_us();
 
         this->waveRes = Synth->getWaveRes();
+        setWaveType(SIN);
         setFrq(frq);
         setGain(gain);
         angle = 0.0f;    
@@ -86,9 +98,13 @@ class LFO{
         float step = (Synth->getSamplePeriod_us())/cycle_period_us;//Calculate how much each time step (samplePeriod) changes the angle
         angularStep = step*(waveRes - 1);
     }
+    void setWaveType(WAVE_TYPE wt){
+        this->wave_type = wt;
+    }
     private:
         WaveGen * Synth;
         bool active;
+        WAVE_TYPE wave_type;
         float LFOgain;
         float samplePeriod_us;
         float cycle_period_us;

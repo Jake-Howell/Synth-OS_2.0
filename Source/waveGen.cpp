@@ -90,13 +90,48 @@ void WaveGen::readMIDI(MIDI_cmd_t cmd){
             break;
 
         case CONTROL_CHANGE:
-            PrintQueue.call(printf, "CONTROL_CHANGE: %d \t%d\r\n", cmd.param1, cmd.param2);
+            controlChange(cmd.param1, cmd.param2);
+            //PrintQueue.call(printf, "CONTROL_CHANGE: %d \t%d\r\n", cmd.param1, cmd.param2);
             break;
 
         case PITCHWHEEL:
             mPitchwheel = cmd.param1;
-            PrintQueue.call(printf, "PITCH_WHEEL: %d \t%d\r\n", cmd.param1);
+            //PrintQueue.call(printf, "PITCH_WHEEL: %d \t%d\r\n", cmd.param1);
             break;
+    }
+}
+void WaveGen::controlChange(uint8_t ctrl_num, uint8_t value){
+    const char * FXname;
+    float scalar = (float)value/127;
+    switch (ctrl_num) {
+        case 1:{
+            this->audioFX[0]->updateLFOgain(scalar);
+            FXname = this->audioFX[0]->getName();
+            PrintQueue.call(printf, "%s LFO Gain: %5.4f\r\n", FXname, scalar);
+            break;
+        }
+        case 2:{
+            this->audioFX[0]->updateLFOFrq((float)value/127);
+            FXname = this->audioFX[0]->getName();
+            PrintQueue.call(printf, "%s LFO Frq: %5.4f Hz\r\n", FXname, scalar);
+            break;
+        }
+        case 3:{
+            this->audioFX[1]->updateLFOgain(scalar);
+            FXname = this->audioFX[1]->getName();
+            PrintQueue.call(printf, "%s LFO Gain: %5.4f\r\n", FXname, scalar);
+            break;
+        }
+        case 4:{
+            this->audioFX[1]->updateLFOFrq((float)value/127);
+            FXname = this->audioFX[1]->getName();
+            PrintQueue.call(printf, "%s LFO Frq: %5.4f Hz\r\n", FXname, scalar);
+            break;
+        }
+        default: {
+        //do nothing 
+            break;
+        }
     }
 }
 WAVE_TYPE WaveGen::getWaveType(){
@@ -115,12 +150,15 @@ float WaveGen::produceSample(){
     for (int i = 0; i<KEY_COUNT; i++){
         sample += keys[i]->getSample();      //get sample from each key
     }
-    if (active_keys>1){
-        sample = sample/active_keys; //scale RMS
-    }
-    //Master Clipping
+    //
+
+    //scale sample as if all keys are playing at once
+    sample = sample/KEY_COUNT; //scale RMS
+    //scale gain for volume control
     sample = sample*gainScalar;
-    sample += 0.5f; //Level shift sample - 0 to 1
+    //Level shift sample - 0 to 1
+    sample += 0.5f; 
+    //Master Clipping
     sample = (sample > 1.0f)?1.0f:sample;
     sample = (sample < 0.0f)?0.0f:sample;
     return sample;   //return output after scaling

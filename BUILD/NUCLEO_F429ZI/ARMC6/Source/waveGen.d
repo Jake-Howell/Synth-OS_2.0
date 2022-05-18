@@ -317,5 +317,5 @@ BUILD\NUCLEO_F429ZI\ARMC6\Source\waveGen.o: Source\waveGen.cpp \
   Source\envelope.h Source\AudioFX\LinearASDR.h \
   Source\AudioFX\..\envelope.h Source\AudioFX\..\global_defs.hpp \
   Source\AudioFX\AudioFX.h Source\global_defs.hpp Source\waveGen.h \
-  Source\AudioFX\FX.h Source\AudioFX\LFO.h Source\AudioFX\Tremolo.h \
-  Source\AudioFX\vibrato.h
+  Source\AudioFX\FX.h Source\AudioFX\LFO.h Source\cbuff.hpp \
+  Source\AudioFX\Tremolo.h Source\AudioFX\vibrato.h

@@ -317,6 +317,7 @@ BUILD\NUCLEO_F429ZI\ARMC6\Source\main.o: Source\main.cpp \
   Source\global_defs.hpp Source\Key.h Source\envelope.h \
   Source\AudioFX\LinearASDR.h Source\AudioFX\..\envelope.h \
   Source\AudioFX\..\global_defs.hpp Source\AudioFX\FX.h \
-  Source\AudioFX\LFO.h Source\AudioFX\Tremolo.h Source\AudioFX\vibrato.h \
-  Source\Threads.h Source\HW_Timer.h Source\cbuff.hpp Source\waveGen.h \
-  Source\MIDI_Decoder.hpp Source\RotaryEncoder.h Source\BM_DAC.hpp
+  Source\AudioFX\LFO.h Source\cbuff.hpp Source\AudioFX\Tremolo.h \
+  Source\AudioFX\vibrato.h Source\Threads.h Source\HW_Timer.h \
+  Source\cbuff.hpp Source\waveGen.h Source\MIDI_Decoder.hpp \
+  Source\RotaryEncoder.h Source\BM_DAC.hpp

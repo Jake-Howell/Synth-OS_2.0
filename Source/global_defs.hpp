@@ -16,7 +16,7 @@
 #define SAMPLE_RATE 50000
 #define BUFFER_SIZE 4096
 
-#define KEY_COUNT 10
+#define KEY_COUNT 4
 #define MAX_FX 5
 
 #define LFO_MAX_GAIN    1.0f

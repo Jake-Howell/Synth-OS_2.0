@@ -58,6 +58,7 @@ float Key::runEnv(){
                 break;
             case SUSTAIN:
                 envGain = envelope->Sustain();  //stay in sustain state until synth changes it
+                time_steps = 0;
                 break;
             case RELEASE:
                 envGain = envelope->Release(time_steps);
@@ -114,16 +115,22 @@ float Key::getSin(){
     return sample;	
 }
 float Key::getTri(){
-    float sample = getSin();
-    sample = ((angle >= (float)waveRes/2)?(2*(angle/(waveRes-1))):(-2*(angle/(waveRes-1))));   //convert sine to triangle wave
+    float sample = 0.0f;
+    if(angle < (float)waveRes*0.25){
+        sample = 0.0f + ((2*angle)/(waveRes));
+    }else if(angle < (float)waveRes*0.75){
+        sample = 1.0f -((2*angle)/(waveRes));
+    }else if(angle <= (waveRes)){
+        sample = ((2*angle)/(waveRes))-2.0f;
+    }
     return sample;
 }
 float Key::getSaw(){
-    float sample = (angle/(waveRes-1));
+    float sample = (angle/(waveRes-1))-0.5f;
     return sample;
 }
 float Key::getSqu(){
-    float sample = ((angle >= (float)waveRes/2)?1:0);  
+    float sample = ((angle >= (float)waveRes/2)?0.5f:-0.5f);  
     return sample;
 }
 

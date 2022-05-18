@@ -27,7 +27,7 @@ BM_DAC dac('A', 5);
 WaveGen Synth(SAMPLE_RATE);
 //add effects to synthsizer 
 Vibrato vib(&Synth, 10.0f, 0.02f);  //vibrato @ 10Hz, +-2% frequency 
-//Tremolo trem(&Synth, 10.0f, 0.9f);    //Tremolo @ 10Hz +- 90% gain
+Tremolo trem(&Synth, 10.0f, 0.9f);    //Tremolo @ 10Hz +- 90% gain
 
 MIDI Midi;
 
@@ -57,7 +57,7 @@ int main()
     //Synth.pressNote(50,100);
     //Synth.pressNote(73,100);
     RPi_Coms.attach(&getUserInput, SerialBase::RxIrq);   //call get user input on usart rx interupt 
-    DAC_buffer.setThreshold((BUFFER_SIZE-1));
+    DAC_buffer.setThreshold((BUFFER_SIZE-10));
 
     start_threads();
 
@@ -92,7 +92,10 @@ void getUserInput(){
     RPi_Coms.read(&d, 1);    //copy data from UART Reg to char d
     //PC_Coms.write(&d, 1);
     //PrintQueue.call(printf, "MIDI Data: %d\r\n", d);
+    
     Midi.serialBuffer.put(d);   //put data onto buffer
+    
+    
     if (Midi.serialBuffer.size() >= 4){
         MIDI_Thread.flags_set(MIDI_DATA_READY);   //signal MIDI Converter, to start converting data
     }
