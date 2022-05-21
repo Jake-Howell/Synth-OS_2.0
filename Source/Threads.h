@@ -7,6 +7,7 @@
 #include "waveGen.h"
 #include "MIDI_Decoder.hpp"
 #include "RotaryEncoder.h"
+#include "waveSelector.h"
 
 
 

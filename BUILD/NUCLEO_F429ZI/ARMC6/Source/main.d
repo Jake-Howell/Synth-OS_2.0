@@ -313,11 +313,13 @@ BUILD\NUCLEO_F429ZI\ARMC6\Source\main.o: Source\main.cpp \
   mbed-os\platform\include\platform\mbed_stats.h \
   mbed-os\platform\include\platform\Stream.h \
   mbed-os\platform\include\platform\FileLike.h Source\AudioFX\AudioFX.h \
-  Source\global_defs.hpp Source\waveGen.h Source\note_periods.cpp \
-  Source\global_defs.hpp Source\Key.h Source\envelope.h \
+  Source\global_defs.hpp Source\DSP\waveGen.h \
+  Source\DSP\note_periods.cpp Source\DSP\Key.h Source\envelope.h \
   Source\AudioFX\LinearASDR.h Source\AudioFX\..\envelope.h \
   Source\AudioFX\..\global_defs.hpp Source\AudioFX\FX.h \
-  Source\AudioFX\LFO.h Source\cbuff.hpp Source\AudioFX\Tremolo.h \
-  Source\AudioFX\vibrato.h Source\Threads.h Source\HW_Timer.h \
-  Source\cbuff.hpp Source\waveGen.h Source\MIDI_Decoder.hpp \
-  Source\RotaryEncoder.h Source\BM_DAC.hpp
+  Source\AudioFX\LFO.h Source\cbuff.hpp Source\AudioFX\LinearASDR.h \
+  Source\AudioFX\Tremolo.h Source\AudioFX\vibrato.h Source\Threads.h \
+  Source\HW_Timer.h Source\cbuff.hpp Source\MIDI_Decoder.hpp \
+  Source\global_defs.hpp Source\IO-Devices\RotaryEncoder.h \
+  Source\IO-Devices\waveSelector.h Source\IO-Devices\button.h \
+  Source\IO-Devices\BM_DAC.hpp

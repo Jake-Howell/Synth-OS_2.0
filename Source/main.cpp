@@ -26,14 +26,22 @@ BM_DAC dac('A', 5);
 //Create Synthasizer
 WaveGen Synth(SAMPLE_RATE);
 //add effects to synthsizer 
-Vibrato vib(&Synth, 10.0f, 0.02f);  //vibrato @ 10Hz, +-2% frequency 
-Tremolo trem(&Synth, 10.0f, 0.9f);    //Tremolo @ 10Hz +- 90% gain
+Vibrato vib(&Synth, 0.0f, 0.02f);  //vibrato @ 10Hz, +-2% frequency 
+Tremolo trem(&Synth, 0.0f, 0.02f);    //Tremolo @ 10Hz +- 2% gain
 
 MIDI Midi;
 
-RotaryEncoder RE_D(RE_D_Pins, &vib, LFO_GAIN);
-RotaryEncoder RE_C(RE_C_Pins, &vib, LFO_RATE);
+//set up IO
+RotaryEncoder   RE_D(RE_D_Pins, &vib, LFO_GAIN);
+RotaryEncoder   RE_C(RE_C_Pins, &vib, LFO_RATE);
 
+WaveSelector    SineWave(&Synth, SIN, PC_8, "Sine Wave");
+WaveSelector    TriangleWave(&Synth, TRI, PC_9, "Triangle Wave");
+WaveSelector    SawToothWave(&Synth, SAW, PC_10, "SawTooth Wave");
+WaveSelector    SquareWave(&Synth, SQU, PC_11, "Square Wave");
+
+
+//set up threads
 Thread SampleProducerThread(osPriorityHigh, OS_STACK_SIZE, nullptr, "Sample Producer");
 Thread PrintThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "Print Thread");
 Thread MIDI_Thread(osPriorityNormal, OS_STACK_SIZE, nullptr, "MIDI Thread");
@@ -55,7 +63,7 @@ int main()
     printf("\r\nSystem Core Clck:\t%d MHz\r\n", (SystemCoreClock/1000000));
     Synth.setWaveType(TRI);
     //Synth.pressNote(50,100);
-    //Synth.pressNote(73,100);
+    Synth.pressNote(73,100);
     RPi_Coms.attach(&getUserInput, SerialBase::RxIrq);   //call get user input on usart rx interupt 
     DAC_buffer.setThreshold((BUFFER_SIZE-10));
 

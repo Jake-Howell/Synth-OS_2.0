@@ -28,12 +28,12 @@ class RotaryEncoder{
             switch(this->controlParam){
                 case LFO_GAIN:              //update how much LFO modulates a signal
                     fx->updateLFOgain(scalar);  //send 0 to 1
-                    PrintQueue.call(printf,"LFO gain: %5.4f\r\n", scalar);
+                    PrintQueue.call(printf,"Vibrato LFO gain: %5.4f\r\n", scalar);
                 break;
                 case LFO_RATE:              //update the frequency of the LFO
                     float frq = 10*scalar;
                     fx->updateLFOFrq(frq); //send between 0 and 10 Hz
-                    PrintQueue.call(printf, "LFO Frequency: %5.4f\r\n", frq);
+                    PrintQueue.call(printf, "Vibrato LFO Frequency: %5.4f Hz\r\n", frq);
                 break;
             }
         }

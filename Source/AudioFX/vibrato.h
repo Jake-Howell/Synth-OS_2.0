@@ -8,7 +8,7 @@ class Vibrato : public FX{
     public:
     Vibrato(WaveGen* Synth, float frequency, float gain):FX(Synth){
         name = "Vibrato";
-        updateLFO(frequency, gain);
+        updateLFO(0, 0);
         addToSynth();
     }
     //override control to control frequency

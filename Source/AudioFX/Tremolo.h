@@ -8,7 +8,7 @@ class Tremolo : public FX{
     public:
     Tremolo(WaveGen * Synth, float frequency, float gain):FX(Synth){
         name = "Tremolo";
-        updateLFO(frequency, gain);
+        updateLFO(0, 0);
         addToSynth();
     }
     void updateFX() override{

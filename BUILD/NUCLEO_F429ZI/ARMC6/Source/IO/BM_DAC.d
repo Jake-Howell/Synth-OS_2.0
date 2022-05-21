@@ -1,5 +1,5 @@
-BUILD\NUCLEO_F429ZI\ARMC6\Source\Threads.o: Source\Threads.cpp \
-  BUILD\NUCLEO_F429ZI\ARMC6\mbed_config.h Source\Threads.h \
+BUILD\NUCLEO_F429ZI\ARMC6\Source\IO\BM_DAC.o: Source\IO\BM_DAC.cpp \
+  BUILD\NUCLEO_F429ZI\ARMC6\mbed_config.h Source\IO\BM_DAC.hpp \
   mbed-os\mbed.h mbed-os\platform\include\platform\mbed_version.h \
   mbed-os\rtos\include\rtos\rtos.h \
   mbed-os\rtos\include\rtos\internal\mbed_rtos_storage.h \
@@ -312,13 +312,4 @@ BUILD\NUCLEO_F429ZI\ARMC6\Source\Threads.o: Source\Threads.cpp \
   mbed-os\platform\include\platform\ScopedRamExecutionLock.h \
   mbed-os\platform\include\platform\mbed_stats.h \
   mbed-os\platform\include\platform\Stream.h \
-  mbed-os\platform\include\platform\FileLike.h Source\HW_Timer.h \
-  Source\cbuff.hpp Source\DSP\waveGen.h Source\DSP\note_periods.cpp \
-  Source\global_defs.hpp Source\DSP\Key.h Source\envelope.h \
-  Source\AudioFX\LinearASDR.h Source\AudioFX\..\envelope.h \
-  Source\AudioFX\..\global_defs.hpp Source\MIDI_Decoder.hpp \
-  Source\global_defs.hpp Source\IO-Devices\RotaryEncoder.h \
-  Source\AudioFX\AudioFX.h Source\AudioFX\FX.h Source\AudioFX\LFO.h \
-  Source\cbuff.hpp Source\AudioFX\LinearASDR.h Source\AudioFX\Tremolo.h \
-  Source\AudioFX\vibrato.h Source\IO-Devices\waveSelector.h \
-  Source\IO-Devices\button.h
+  mbed-os\platform\include\platform\FileLike.h

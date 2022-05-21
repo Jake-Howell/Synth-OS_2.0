@@ -1,6 +1,6 @@
-BUILD\NUCLEO_F429ZI\ARMC6\Source\i2S.o: Source\i2S.cpp \
-  BUILD\NUCLEO_F429ZI\ARMC6\mbed_config.h Source\i2S.h mbed-os\mbed.h \
-  mbed-os\platform\include\platform\mbed_version.h \
+BUILD\NUCLEO_F429ZI\ARMC6\Source\DSP\Key.o: Source\DSP\Key.cpp \
+  BUILD\NUCLEO_F429ZI\ARMC6\mbed_config.h Source\DSP\Key.h \
+  mbed-os\mbed.h mbed-os\platform\include\platform\mbed_version.h \
   mbed-os\rtos\include\rtos\rtos.h \
   mbed-os\rtos\include\rtos\internal\mbed_rtos_storage.h \
   mbed-os\cmsis\device\rtos\include\mbed_rtx_storage.h \
@@ -312,4 +312,7 @@ BUILD\NUCLEO_F429ZI\ARMC6\Source\i2S.o: Source\i2S.cpp \
   mbed-os\platform\include\platform\ScopedRamExecutionLock.h \
   mbed-os\platform\include\platform\mbed_stats.h \
   mbed-os\platform\include\platform\Stream.h \
-  mbed-os\platform\include\platform\FileLike.h Source\global_defs.hpp
+  mbed-os\platform\include\platform\FileLike.h Source\envelope.h \
+  Source\AudioFX\LinearASDR.h Source\AudioFX\..\envelope.h \
+  Source\AudioFX\..\global_defs.hpp Source\global_defs.hpp \
+  Source\DSP\waveGen.h Source\DSP\note_periods.cpp

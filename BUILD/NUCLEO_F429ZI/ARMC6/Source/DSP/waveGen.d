@@ -1,6 +1,6 @@
-BUILD\NUCLEO_F429ZI\ARMC6\Source\AudioFX\vibrato.o: \
-  Source\AudioFX\vibrato.cpp BUILD\NUCLEO_F429ZI\ARMC6\mbed_config.h \
-  Source\AudioFX\vibrato.h mbed-os\mbed.h \
+BUILD\NUCLEO_F429ZI\ARMC6\Source\DSP\waveGen.o: Source\DSP\waveGen.cpp \
+  BUILD\NUCLEO_F429ZI\ARMC6\mbed_config.h Source\DSP\waveGen.h \
+  Source\DSP\note_periods.cpp Source\global_defs.hpp mbed-os\mbed.h \
   mbed-os\platform\include\platform\mbed_version.h \
   mbed-os\rtos\include\rtos\rtos.h \
   mbed-os\rtos\include\rtos\internal\mbed_rtos_storage.h \
@@ -313,8 +313,9 @@ BUILD\NUCLEO_F429ZI\ARMC6\Source\AudioFX\vibrato.o: \
   mbed-os\platform\include\platform\ScopedRamExecutionLock.h \
   mbed-os\platform\include\platform\mbed_stats.h \
   mbed-os\platform\include\platform\Stream.h \
-  mbed-os\platform\include\platform\FileLike.h Source\global_defs.hpp \
-  Source\AudioFX\FX.h Source\waveGen.h Source\note_periods.cpp \
-  Source\global_defs.hpp Source\Key.h Source\envelope.h \
-  Source\AudioFX\LinearASDR.h Source\AudioFX\..\envelope.h \
-  Source\AudioFX\..\global_defs.hpp Source\AudioFX\LFO.h
+  mbed-os\platform\include\platform\FileLike.h Source\DSP\Key.h \
+  Source\envelope.h Source\AudioFX\LinearASDR.h \
+  Source\AudioFX\..\envelope.h Source\AudioFX\..\global_defs.hpp \
+  Source\AudioFX\AudioFX.h Source\DSP\waveGen.h Source\AudioFX\FX.h \
+  Source\AudioFX\LFO.h Source\cbuff.hpp Source\AudioFX\LinearASDR.h \
+  Source\AudioFX\Tremolo.h Source\AudioFX\vibrato.h

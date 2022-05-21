@@ -39,7 +39,7 @@ class WaveGen{
 
     private:
         Key *keys[KEY_COUNT];
-        FX *audioFX[MAX_FX];   //TODO add list of audio FX to run and call vibrato
+        FX *audioFX[MAX_FX];   
         ASDR_Params_t ASDR_Params;
         uint16_t fx_count;
         WAVE_TYPE mWaveType;            //Type of wave to be generated (SIN, SAW, TRI, SQU)
@@ -47,7 +47,6 @@ class WaveGen{
         //Synth Params
         unsigned int mSampleRate;       //48KHz sample rate
         float mSamplePeriod_us;         //10.41667 us @ 96KHz
-        unsigned int active_keys;       //store the number of active keys
 		unsigned int mWaveRes = 1024;   //resoloution of wave table
 		float mSineTable[1024];		    //sinetable from 0 to 90 degrees
         //FX Params

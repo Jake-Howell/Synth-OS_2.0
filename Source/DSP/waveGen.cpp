@@ -58,7 +58,7 @@ void WaveGen::pressNote(char noteNum, char velocity){	//add note to wave gen, an
     for (int i = 0; i < KEY_COUNT; i++){
         if (!(keys[i]->isActive())){    //if key is not active, use key to play note
             keys[i]->setKeyParams(noteNum, velocity);
-            active_keys++;
+
             return;
         }
     }
@@ -72,7 +72,7 @@ void WaveGen::releaseNote(int MIDInum){
         if (keys[i]->isActive() && (keys[i]->getMIDInum() == MIDInum)){    
             //put key into release state
             keys[i]->releaseKey();
-            active_keys--;
+
             return;
         }
     }
@@ -103,6 +103,7 @@ void WaveGen::readMIDI(MIDI_cmd_t cmd){
 void WaveGen::controlChange(uint8_t ctrl_num, uint8_t value){
     const char * FXname;
     float scalar = (float)value/127;
+    float FrqScalar = 10*scalar;
     switch (ctrl_num) {
         case 1:{
             this->audioFX[0]->updateLFOgain(scalar);
@@ -111,9 +112,9 @@ void WaveGen::controlChange(uint8_t ctrl_num, uint8_t value){
             break;
         }
         case 2:{
-            this->audioFX[0]->updateLFOFrq((float)value/127);
+            this->audioFX[0]->updateLFOFrq(FrqScalar);
             FXname = this->audioFX[0]->getName();
-            PrintQueue.call(printf, "%s LFO Frq: %5.4f Hz\r\n", FXname, scalar);
+            PrintQueue.call(printf, "%s LFO Frq: %5.4f Hz\r\n", FXname, FrqScalar);
             break;
         }
         case 3:{
@@ -123,9 +124,10 @@ void WaveGen::controlChange(uint8_t ctrl_num, uint8_t value){
             break;
         }
         case 4:{
-            this->audioFX[1]->updateLFOFrq((float)value/127);
+            
+            this->audioFX[1]->updateLFOFrq(FrqScalar);
             FXname = this->audioFX[1]->getName();
-            PrintQueue.call(printf, "%s LFO Frq: %5.4f Hz\r\n", FXname, scalar);
+            PrintQueue.call(printf, "%s LFO Frq: %5.4f Hz\r\n", FXname, FrqScalar);
             break;
         }
         default: {

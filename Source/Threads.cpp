@@ -7,6 +7,12 @@ extern MIDI Midi;
 extern RotaryEncoder RE_D;
 extern RotaryEncoder RE_C;
 
+extern WaveSelector SineWave;
+extern WaveSelector TriangleWave;
+extern WaveSelector SawToothWave;
+extern WaveSelector SquareWave;
+
+
 void start_threads(){
     //start print queue
     PrintThread.start(printer);
@@ -73,8 +79,12 @@ void updateIO(){
     while(1){
         RE_D.update_pos();
         RE_C.update_pos();
-        uint8_t pos = RE_D.getPos();
-        uint8_t GC = RE_D.getGC();
+        SineWave.control();
+        TriangleWave.control();
+        SawToothWave.control();
+        SquareWave.control();
+        //uint8_t pos = RE_D.getPos();
+        //uint8_t GC = RE_D.getGC();
         //PrintQueue.call(printf,"RE_D Pos: %d\tGC: %d\r\n", pos, GC);
         ThisThread::sleep_for(50ms);
     }

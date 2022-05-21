@@ -314,5 +314,5 @@ BUILD\NUCLEO_F429ZI\ARMC6\Source\AudioFX\LinearASDR.o: \
   mbed-os\platform\include\platform\mbed_stats.h \
   mbed-os\platform\include\platform\Stream.h \
   mbed-os\platform\include\platform\FileLike.h \
-  Source\AudioFX\..\global_defs.hpp Source\Key.h Source\envelope.h \
-  Source\global_defs.hpp
+  Source\AudioFX\..\global_defs.hpp Source\DSP\Key.h Source\envelope.h \
+  Source\AudioFX\LinearASDR.h Source\global_defs.hpp
