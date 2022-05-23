@@ -33,7 +33,7 @@ class LFO{
         float scalar = 1.0; //if note note active scalar = 1
         if(active){
             angle += angularStep;
-            angle = (angle > ((float)(waveRes - 1)))?(angle - ((float)(waveRes - 1))):(angle); //bound angle to limits
+            angle = (angle >= ((float)(waveRes - 1)))?(angle - ((float)(waveRes - 1))):(angle); //bound angle to limits
             switch(Synth->getWaveType()){
                 case SIN:
                     scalar = getSin();      //
@@ -51,13 +51,8 @@ class LFO{
                     break;
             }
         }
-        //printf("key Sample: %d\tangle: %d\r\n",(int)(100*sample), (unsigned int)angle);
-        //return scalar centered around 1.0
-        //Scalar     = 1.0 + LFOgain*scalar = output Scalar
-        //max scalar = 1.0 + (2* 0.5) = 2.0
-        //min scalar = 1.0 + (2*-0.5) = 0.0
-        //printf("LFO");
-        return (1.0 + LFOgain*scalar);
+
+        return (1.0f + LFOgain*scalar);
     }
 
     //returns sin value from -0.5 to +0.5
@@ -68,8 +63,14 @@ class LFO{
         return sample;	
     }
     float getTri(){
-        float sample = getSin();
-        sample = ((angle >= (float)waveRes/2)?(2*(angle/(waveRes-1))):(-2*(angle/(waveRes-1))));   //convert sine to triangle wave
+        float sample = 0.0f;
+        if(angle < (float)waveRes*0.25){            //if angle in first quarter
+            sample = 0.0f + ((2*angle)/(waveRes));  //sample: y = 2x 
+        }else if(angle < (float)waveRes*0.75){      //if angle less than 3 quaters
+            sample = 1.0f -((2*angle)/(waveRes));   //sample: y = 1 -2x
+        }else if(angle <= (waveRes)){               //if sample is in last quater of wave form
+            sample = ((2*angle)/(waveRes))-2.0f;    //sample: y = 2x - 2
+        }
         return sample;
     }
     float getSaw(){

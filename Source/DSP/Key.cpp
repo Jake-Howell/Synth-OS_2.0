@@ -116,12 +116,12 @@ float Key::getSin(){
 }
 float Key::getTri(){
     float sample = 0.0f;
-    if(angle < (float)waveRes*0.25){
-        sample = 0.0f + ((2*angle)/(waveRes));
-    }else if(angle < (float)waveRes*0.75){
-        sample = 1.0f -((2*angle)/(waveRes));
-    }else if(angle <= (waveRes)){
-        sample = ((2*angle)/(waveRes))-2.0f;
+    if(angle < (float)waveRes*0.25){            //if angle in first quarter
+        sample = 0.0f + ((2*angle)/(waveRes));  //sample: y = 2x 
+    }else if(angle < (float)waveRes*0.75){      //if angle less than 3 quaters
+        sample = 1.0f -((2*angle)/(waveRes));   //sample: y = 1 -2x
+    }else if(angle <= (waveRes)){               //if sample is in last quater of wave form
+        sample = ((2*angle)/(waveRes))-2.0f;    //sample: y = 2x - 2
     }
     return sample;
 }
