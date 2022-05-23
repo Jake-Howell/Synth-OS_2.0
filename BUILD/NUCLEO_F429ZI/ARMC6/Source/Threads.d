@@ -320,5 +320,8 @@ BUILD\NUCLEO_F429ZI\ARMC6\Source\Threads.o: Source\Threads.cpp \
   Source\global_defs.hpp Source\IO-Devices\RotaryEncoder.h \
   Source\AudioFX\AudioFX.h Source\AudioFX\FX.h Source\AudioFX\LFO.h \
   Source\cbuff.hpp Source\AudioFX\LinearASDR.h Source\AudioFX\Tremolo.h \
-  Source\AudioFX\vibrato.h Source\IO-Devices\waveSelector.h \
-  Source\IO-Devices\button.h
+  Source\AudioFX\vibrato.h Source\IO-Devices\\IO_interface.h \
+  Source\IO-Devices\IO_checker.h Source\IO-Devices\IO_Interface.h \
+  Source\IO-Devices\waveSelector.h Source\IO-Devices\button.h \
+  Source\IO-Devices\IO-Devices.h Source\IO-Devices\RotaryEncoder.h \
+  Source\IO-Devices\waveSelector.h

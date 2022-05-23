@@ -1,17 +1,14 @@
 #include "Threads.h"
+#include "IO-Devices.h"
 extern Thread PrintThread, IOCheckThread, MIDI_Thread, SampleProducerThread;
 extern osThreadId_t PrintThreadID, mainThreadID, SampleProducerThreadID, outputStreamThreadID, MIDI_ThreadID;
 extern Circular_Buff<float> DAC_buffer;
 extern WaveGen Synth;
 extern MIDI Midi;
-extern RotaryEncoder RE_D;
-extern RotaryEncoder RE_C;
+extern RotaryEncoder RE_D, RE_C;
+extern WaveSelector SineButton, TriangleButton, SawToothButton, SquareButton;
 
-extern WaveSelector SineWave;
-extern WaveSelector TriangleWave;
-extern WaveSelector SawToothWave;
-extern WaveSelector SquareWave;
-
+extern IO_Checker DeviceUpdater;
 
 void start_threads(){
     //start print queue
@@ -65,7 +62,6 @@ void MIDI_Converter(){
             cmd = Midi.cmdBuffer.get();     //get cmd
             Synth.readMIDI(cmd);            //send midi cmd to synth
         }
-        
     }
 }
 
@@ -75,17 +71,10 @@ void printer(){
 }
 
 void updateIO(){
+    int status = 0;
     PrintQueue.call(printf, "Starting IO Check\r\n");
-    while(1){
-        RE_D.update_pos();
-        RE_C.update_pos();
-        SineWave.control();
-        TriangleWave.control();
-        SawToothWave.control();
-        SquareWave.control();
-        //uint8_t pos = RE_D.getPos();
-        //uint8_t GC = RE_D.getGC();
-        //PrintQueue.call(printf,"RE_D Pos: %d\tGC: %d\r\n", pos, GC);
-        ThisThread::sleep_for(50ms);
+    while(status == 0){
+        status = DeviceUpdater.run_IOchecks();
     }
+    PrintQueue.call(printf, "ERROR: IO Check Thread exited with status code %d\r\n", status);
 }

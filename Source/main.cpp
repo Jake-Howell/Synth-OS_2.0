@@ -1,7 +1,7 @@
 #include "mbed.h"
 #include "AudioFX.h"
 #include "Threads.h"
-
+#include "IO-Devices.h"
 #include "BM_DAC.hpp"
 #include "rtos/ThisThread.h"
 #include "HW_Timer.h"
@@ -12,43 +12,41 @@
 #include <cstdint>
 #include <cstdio>
 #include <stdint.h>
+
 DigitalOut LED(LED1);
 UnbufferedSerial PC_Coms(USBTX, USBRX, 115200);
 UnbufferedSerial RPi_Coms(PD_5, PD_6, 115200);
 
 
 Circular_Buff<float> DAC_buffer(BUFFER_SIZE);
-//DigitalIn(PC_12);
-//InterruptIn USER_BUTTON;
 
-//AnalogOut dac(PA_5);
+//Initalise bare metal DAC
 BM_DAC dac('A', 5);
 //Create Synthasizer
 WaveGen Synth(SAMPLE_RATE);
+//Create IO updater
+IO_Checker DeviceUpdater;
+
 //add effects to synthsizer 
 Vibrato vib(&Synth, 0.0f, 0.02f);  //vibrato @ 10Hz, +-2% frequency 
 Tremolo trem(&Synth, 0.0f, 0.02f);    //Tremolo @ 10Hz +- 2% gain
 
 MIDI Midi;
 
-//set up IO
-RotaryEncoder   RE_D(RE_D_Pins, &vib, LFO_GAIN);
-RotaryEncoder   RE_C(RE_C_Pins, &vib, LFO_RATE);
-
-WaveSelector    SineWave(&Synth, SIN, PC_8, "Sine Wave");
-WaveSelector    TriangleWave(&Synth, TRI, PC_9, "Triangle Wave");
-WaveSelector    SawToothWave(&Synth, SAW, PC_10, "SawTooth Wave");
-WaveSelector    SquareWave(&Synth, SQU, PC_11, "Square Wave");
-
-
 //set up threads
 Thread SampleProducerThread(osPriorityHigh, OS_STACK_SIZE, nullptr, "Sample Producer");
 Thread PrintThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "Print Thread");
 Thread MIDI_Thread(osPriorityNormal, OS_STACK_SIZE, nullptr, "MIDI Thread");
 Thread IOCheckThread(osPriorityNormal, OS_STACK_SIZE, nullptr, "IO Check Thread");
-
-
 EventQueue PrintQueue;
+
+//set up IO Devices
+RotaryEncoder   RE_D(&DeviceUpdater, RE_D_Pins, &vib, LFO_GAIN, "Vibrato Gain control knob");
+RotaryEncoder   RE_C(&DeviceUpdater, RE_C_Pins, &vib, LFO_RATE, "Vibrato Rate control knob");
+WaveSelector    SineButton(&Synth, &DeviceUpdater, SIN, PC_8, "Sine Wave button");
+WaveSelector    TriangleButton(&Synth, &DeviceUpdater, TRI, PC_9, "Triangle Wave button");
+WaveSelector    SawToothButton(&Synth, &DeviceUpdater, SAW, PC_10, "SawTooth Wave button");
+WaveSelector    SquareButton(&Synth, &DeviceUpdater, SQU, PC_11, "Square Wave button");
 
 
 //ISR Callback functions
